@@ -8,10 +8,9 @@ config_file=$6
 cms2_tag=$7
 max_run=$8
 TOOL_DIR=./
-#Change the command below and the url to smth appropriate
-#dbsql find run, file where run >=${min_run} and dataset=${sd_dataset_name} #| grep store/ | awk '{print $1" "$2}' > ${sd_sub_dir}/a.runs.list.tmp
-#python /code/osgcode/cmssoft/cms/slc5_ia32_gcc434/cms/dbs-client/DBS_2_0_9_patch_4/lib/DBSAPI/dbsCommandLine.py --url="http://cmsdbsprod.cern.ch/cms_dbs_prod_global/servlet/DBSServlet" --query="find run,file where run=${min_run}  and dataset=${sd_dataset_name}"  | grep store/ | awk '{print $1" "$2}' > ${sd_sub_dir}/a.runs.list.tmp
-#python getLFNList.py --lowrun=${min_run} --highrun=${max_run} --dataset=${sd_dataset_name}|grep store/ | awk '{print $1" "$2}' > ${sd_sub_dir}/a.runs.list.tmp
+whereAmI=$9
+fileFormat=$10
+
 python getLFNList_reco.py --dataset=${sd_dataset_name}|grep .root  > ${sd_sub_dir}/a.runs.list.tmp.phedex
 dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
 
@@ -27,7 +26,7 @@ else
     which mail >& /dev/null && mail -s "dbs query fails " yanjuntu@physics.ucsd.edu < ${sd_sub_dir}/a.list.dbs.tmp 
     exit 99
 fi
-#cat ${sd_sub_dir}/a.runs.list.tmp |grep .root > ${sd_sub_dir}/a.runs.list0.tmp
+
 
 #cat ${sd_sub_dir}/a.runs.list.tmp |awk '{print $2}' > ${sd_sub_dir}/a.runs.list0.tmp
 cat ${sd_sub_dir}/a.runs.list.tmp |grep .root > ${sd_sub_dir}/a.runs.list0.tmp
@@ -82,7 +81,7 @@ log    = /tmp/uselesslog-yanjuntu_${sd_sub_dir}.log
 Notification = Never 
 +Owner = undefined 
 	
-arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run
+arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $whereAmI $fileFormat
 output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 queue

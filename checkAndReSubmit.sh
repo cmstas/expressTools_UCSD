@@ -8,6 +8,8 @@ config_file=$6
 cms2_tag=$7
 max_run=$8
 TOOL_DIR=./
+whereAmI=$9
+fileFormat=$10
 [ ! -d "$sd_sub_dir" ] && echo Create $sd_sub_dir && mkdir $sd_sub_dir
 [ ! -d "$sd_sub_dir/submitting_log" ] && echo Create $sd_sub_dir/submitting_log && mkdir $sd_sub_dir/submitting_log
 [ ! -d "$sd_sub_dir/output" ] && echo Create $sd_sub_dir/output && mkdir $sd_sub_dir/output
@@ -65,7 +67,7 @@ log    = /tmp/uselesslog-yanjuntu_resubmit.log
 Notification = Never 
 +Owner = undefined 
 	
-arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run
+arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $whereAmI $fileFormat
 output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 queue

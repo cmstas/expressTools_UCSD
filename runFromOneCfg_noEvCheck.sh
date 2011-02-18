@@ -15,6 +15,10 @@ fileIn=$3
 
 outputDir=$4
 
+whereAmI=$8
+
+fileFormat=$9
+
 #export DATASET_NAME=$5
 #export CMS2_TAG=$6
 
@@ -42,10 +46,15 @@ export failMkDestDir=""
 [ "x${failMkDestDir}" == "xyes" ] && echo failed to make destination dir && exit 46
 
  input_data_Run=$7
- #fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/file__//g'` ##replace / or : by _; and remove file__
- fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/file__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove file__
-
-echo Will cmsRun ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
+ 
+ if [ "${fileFormat}" == "prompt"  ]; then
+     fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/file__//g'` ##replace / or : by _; and remove file__
+ elif [ "${fileFormat}" == "reco"  ]; then
+     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/file__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove file__
+ else 
+     echo failed to define fileFormat && exit 122 
+ fi
+ echo Will cmsRun ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
 export INPUT_FILE=${fileIn}
 #[ "x${fExt}" == "x" ] && export OUTPUT_FILE=${oDir}/${fileOut}
 #[ "x${fExt}" != "x" ] && export OUTPUT_FILE=${oDir}/${fileOut}.${fExt}

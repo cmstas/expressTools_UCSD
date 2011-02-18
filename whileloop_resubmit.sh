@@ -18,5 +18,5 @@ dataset_dir_1=`echo ${dataset_dir_1_tmp:1} `
 dataset_hadoop_dir_1=`echo ${hadoop_dir}/${dataset_dir_1} `
 
 express_tool_subdir_1=${express_tool_dir}/${dataset_dir_1}
-bash checkAndReSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber
+source checkAndReSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $4 $5
 

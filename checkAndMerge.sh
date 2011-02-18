@@ -4,12 +4,19 @@ submitDir=$2
 #minRun=134987
 minRun=$4
 maxRun=$5
+
+whereAmI=$6
+
+fileFormat=$7
+
+dateS=`date '+%Y.%m.%d-%H.%M.%S'`
+echo Start Merging
+echo $dateS
+
 cd $submitDir
 # get list of files which were not linked to the grouped
-#find grouped -name \*Commissioning10_MinimumBias_RECO_v9\*.root > files.grouped
 [ ! -f "grouped.list" ]  && touch grouped.list
 cat grouped.list |grep ".root" >files.grouped
-#ls ${dc} | grep  ".root" | grep Commissioning10_MinimumBias_RECO_v9 |grep -v ".log" |while read -r f; do
 ls ${dc} | grep  ".root" |grep -v ".log" |while read -r f; do
 grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 
@@ -17,11 +24,18 @@ grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 cp ${submitDir}/a.runs.list.tmp runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
-    f_0=`echo $fr | cut -d"_" -f12 `
-   # f=`echo "$f_0.root" `
-    run=`grep  $f_0 runs.all.express | awk '{print $1}'`
-    #(( run > minRun )) && echo $run $f `grep $f files.ls`
-    (( run >= minRun )) && (( run <= maxRun )) && echo $run `grep $fr files.ls`
+    if [ "fileFormat" == "reco" ]; then
+	 f=`echo $fr | cut -d"_" -f12 `
+	 run=`grep  $f runs.all.express | awk '{print $1}'`
+	 (( run >= minRun )) && (( run <= maxRun )) && echo $run `grep $fr files.ls`
+    elif [ "fileFormat" == "prompt" ]; then
+	f=`echo $fr | cut -d"_" -f13 ` 
+	run=`grep  $f runs.all.express | awk '{print $1}'`
+	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $f files.ls`
+    else
+	echo failed to define fileFormat && exit 133
+    fi 
+   
 done > files.runs.ls
 grep -v ^[1-9]  files.runs.ls >& /dev/null && echo Corrupt  files.runs.ls && exit 33
 
@@ -162,6 +176,9 @@ ls -d 1[3-9]* | while read -r rn; do
       (( curCount=0 ))
 	fi
     done
+    resE="$?"
+   #[ "$resE" != 0 ] && echo Exited with $resE && exit $resE
+    (( resE > 20 )) && echo Exited with $resE && exit $resE
 done
 
 #echo Testing only && exit 30
@@ -212,3 +229,6 @@ done
 
 
 cd $TOOL_DIR
+dateS=`date '+%Y.%m.%d-%H.%M.%S'`
+echo Merging is Done
+echo $dateS
