@@ -23,7 +23,7 @@ if [ -s "${sd_sub_dir}/a.list.dbs" ] ; then
      fi 
 else
     echo a.list.dbs is empty   
-    which mail >& /dev/null && mail -s "dbs query fails " yanjuntu@physics.ucsd.edu < ${sd_sub_dir}/a.list.dbs.tmp 
+    which mail >& /dev/null && mail -s "dbs query fails " imacneill@ucsd.edu < ${sd_sub_dir}/a.list.dbs.tmp 
     exit 99
 fi
 
@@ -31,8 +31,8 @@ fi
 #cat ${sd_sub_dir}/a.runs.list.tmp |awk '{print $2}' > ${sd_sub_dir}/a.runs.list0.tmp
 cat ${sd_sub_dir}/a.runs.list.tmp |grep .root > ${sd_sub_dir}/a.runs.list0.tmp
 
-cp ${sd_sub_dir}/a.list ${sd_sub_dir}/a.list.old
-cp ${sd_sub_dir}/a.runs.list0.tmp ${sd_sub_dir}/a.list
+'cp' ${sd_sub_dir}/a.list ${sd_sub_dir}/a.list.old
+'cp' ${sd_sub_dir}/a.runs.list0.tmp ${sd_sub_dir}/a.list
 
 
 #now we have the old list and the new full list. 
@@ -40,8 +40,8 @@ cp ${sd_sub_dir}/a.runs.list0.tmp ${sd_sub_dir}/a.list
 #check for empty output
 aSize=`grep store/ ${sd_sub_dir}/a.list | grep -c root`
 [ "${aSize}" == "0" ] && echo "Failed to get file list" && exit 23
-#rm -f ${sd_sub_dir}/a.list.new; touch ${sd_sub_dir}/a.list.new; grep store ${sd_sub_dir}/a.list | while read -r f; do grep $f ${sd_sub_dir}/a.list.old >& /dev/null || echo $f >> ${sd_sub_dir}/a.list.new; done
-rm -f ${sd_sub_dir}/a.list.new; touch ${sd_sub_dir}/a.list.new; grep store ${sd_sub_dir}/a.list | while read -r rn f; do grep $f ${sd_sub_dir}/a.list.old >& /dev/null || echo $rn $f >> ${sd_sub_dir}/a.list.new; done
+#'rm' -f ${sd_sub_dir}/a.list.new; touch ${sd_sub_dir}/a.list.new; grep store ${sd_sub_dir}/a.list | while read -r f; do grep $f ${sd_sub_dir}/a.list.old >& /dev/null || echo $f >> ${sd_sub_dir}/a.list.new; done
+'rm' -f ${sd_sub_dir}/a.list.new; touch ${sd_sub_dir}/a.list.new; grep store ${sd_sub_dir}/a.list | while read -r rn f; do grep $f ${sd_sub_dir}/a.list.old >& /dev/null || echo $rn $f >> ${sd_sub_dir}/a.list.new; done
 aNewSize=`grep -c store ${sd_sub_dir}/a.list.new`
 #Don't submit too many jobs, change 2000 below to smth you think make sense
 #(( aNewSize>2000 )) && echo "Need to sub ${aNewSize} jobs: Too many jobs to submit, do it manually " && exit 24

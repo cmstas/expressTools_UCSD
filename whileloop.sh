@@ -5,13 +5,14 @@ dataset_name_1=$3
 
 
 cmssw_dir=`echo /code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src `
+
 minRunNumber=`echo 0 `
 maxRunNumber=`echo 999999 `
-config_file=`echo Data386ReReco_SDFilter_cfg.py `
-hadoop_dir=` echo /hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}` 
+config_file=`echo Data386ReReco_SDFilter_cfg.py`
+hadoop_dir=`echo /hadoop/cms/store/user/macneill/${cmssw_release}_${cms2_tag}`
 express_tool_dir=` echo $PWD `
 #out_dir=` echo /nfs-3/userdata/yanjuntu `
-out_dir=` echo /nfs-3/userdata/cms2 `
+out_dir=`echo /nfs-4/userdata/imacneill`
 [ ! -d "${hadoop_dir}" ] && echo Create ${hadoop_dir} && mkdir ${hadoop_dir}
 
 #dataset_dir_1=`echo $dataset_name_1 |sed -e 's/\/MinimumBias/MinimumBias/g;s?/?_?g' `
@@ -38,9 +39,11 @@ merged_file_dir_1=`echo $out_dir/${dataset_dir_1}/${cms2_tag} `
 while [ 1 ]
   do
   
+
   source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $4 $5
   sleep 5400
-  
+
   source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  $merged_file_dir_1 ${minRunNumber} $maxRunNumber $4 $5
   sleep 5400
 done
+
