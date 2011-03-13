@@ -1,13 +1,11 @@
 dc=$1
 TOOL_DIR=$PWD
 submitDir=$2
-#minRun=134987
+
 minRun=$4
 maxRun=$5
 
-whereAmI=$6
-
-fileFormat=$7
+fileFormat=$6
 
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 echo Start Merging

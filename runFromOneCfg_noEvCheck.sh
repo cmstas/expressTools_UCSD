@@ -15,9 +15,7 @@ fileIn=$3
 
 outputDir=$4
 
-whereAmI=$8
-
-fileFormat=$9
+fileFormat=$8
 
 #export DATASET_NAME=$5
 #export CMS2_TAG=$6
@@ -44,6 +42,8 @@ export failMkDestDir=""
 [ ! -d "${oDir}" ] && echo Create ${oDir} && mkdir ${oDir}
 [ ! -d "${oDir}" ] &&  export failMkDestDir=yes
 [ "x${failMkDestDir}" == "xyes" ] && echo failed to make destination dir && exit 46
+[ ! -d "${oDir}/log" ] && echo Create ${oDir}/log && mkdir ${oDir}/log
+[ ! -d "${oDir}/xml" ] && echo Create ${oDir}/xml && mkdir ${oDir}/xml
 
  input_data_Run=$7
  
@@ -65,7 +65,7 @@ export DATASET_NAME=$5
 export CMS2_TAG=$6
 echo INPUT_FILE=$INPUT_FILE OUTPUT_FILE=$OUTPUT_FILE N_EVENTS=$N_EVENTS SKIP_EVENTS=$SKIP_EVENTS DATASET_NAME=$DATASET_NAME CMS2_TAG=$CMS2_TAG
 #remove igtrace if you don't like too much stack trace info
-igtrace cmsRun -e ${fileCfg} >& ${oDir}/${fileOut}.log
+igtrace cmsRun -e ${fileCfg} >& ${oDir}/log/${fileOut}.log
 executable_success=$?
 if [ $executable_success -ne 0 ]; then 
     echo cmsRun failed 
@@ -74,7 +74,7 @@ if [ $executable_success -ne 0 ]; then
 fi
 cat ${oDir}/${fileOut}.log
 xmlfileOut=`echo $fileOut | sed -e 's?.root??g'`
-mv FrameworkJobReport.xml ${oDir}/${xmlfileOut}.xml
+mv FrameworkJobReport.xml ${oDir}/xml/${xmlfileOut}.xml
 echo Almost Done  at `date`
 ls -ltrh ${oDir}
 

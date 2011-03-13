@@ -8,8 +8,7 @@ config_file=$6
 cms2_tag=$7
 max_run=$8
 TOOL_DIR=./
-whereAmI=$9
-fileFormat=$10
+fileFormat=$9
 
 python getLFNList_reco.py --dataset=${sd_dataset_name}|grep .root  > ${sd_sub_dir}/a.runs.list.tmp.phedex
 dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
@@ -81,7 +80,7 @@ log    = /tmp/uselesslog-yanjuntu_${sd_sub_dir}.log
 Notification = Never 
 +Owner = undefined 
 	
-arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $whereAmI $fileFormat
+arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $fileFormat
 output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 queue
