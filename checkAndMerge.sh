@@ -1,5 +1,4 @@
 dc=$1
-TOOL_DIR=$PWD
 submitDir=$2
 
 minRun=$4
@@ -7,6 +6,7 @@ maxRun=$5
 
 fileFormat=$6
 
+TOOL_DIR=$PWD
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 echo Start Merging
 echo $dateS
@@ -22,14 +22,14 @@ grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 cp ${submitDir}/a.runs.list.tmp runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
-    if [ "fileFormat" == "reco" ]; then
+    if [ "${fileFormat}" == "reco" ]; then
 	 f=`echo $fr | cut -d"_" -f12 `
 	 run=`grep  $f runs.all.express | awk '{print $1}'`
-	 (( run >= minRun )) && (( run <= maxRun )) && echo $run `grep $fr files.ls`
-    elif [ "fileFormat" == "prompt" ]; then
+	 (( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
+    elif [ "${fileFormat}" == "prompt" ]; then
 	f=`echo $fr | cut -d"_" -f13 ` 
 	run=`grep  $f runs.all.express | awk '{print $1}'`
-	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $f files.ls`
+	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     else
 	echo failed to define fileFormat && exit 133
     fi 
@@ -42,11 +42,11 @@ grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do
 	mkdir ${rn}
 	rnL=`echo ${rn} | cut -c1-3`
 	rnR=`echo ${rn} | cut -c4-6`
-	ls -d ${dc}/${rnL} >& /dev/null || mkdir ${dc}/${rnL} 
-	mkdir ${dc}/${rnL}/${rnR}
+	#ls -d ${dc}/${rnL} >& /dev/null || mkdir ${dc}/${rnL} 
+	#mkdir ${dc}/${rnL}/${rnR}
     fi
 done
-grep _cms files.runs.ls | while read -r rn fr; do 
+grep _cms files.runs.ls | while read -r rn fo fr; do 
     if [ ! -h "$rn/$fr" ] ; then
 	ln -s ${dc}/${fr} ${rn}/${fr}
 	sleep 1
@@ -148,7 +148,7 @@ ls -d 1[3-9]* | while read -r rn; do
 	    fi
 	    echo "New/updated end merge ${scriptC} " 
 	
-	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite.so\");\n" >> ${s}
+	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite_5.27.06b-cms10.so\");\n" >> ${s}
 	    echo -e "\n\tTTree::SetMaxTreeSize(39000000000);" >> ${s}
 	    echo -e "\n\te = new TChain(\"Events\");\n "  >> ${s}
 	fi
