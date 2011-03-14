@@ -1,7 +1,7 @@
 #### !/usr/local/bin/bash
-export SCRAM_ARCH=slc5_ia32_gcc434
+export SCRAM_ARCH=slc5_amd64_gcc434
 source /code/osgcode/cmssoft/cms/cmsset_default.sh
-export SCRAM_ARCH=slc5_ia32_gcc434
+export SCRAM_ARCH=slc5_amd64_gcc434
 source /code/osgcode/ucsdt2/gLite/etc/profile.d/grid_env.sh
 echo Begin. Print self first
 cat $0
@@ -25,7 +25,9 @@ fileFormat=$8
 #Go to the release base, setup there and then return to the jobdir
 echo "Will work in" ${relDir} "and run" ${fileCfg} "in:"${fileIn}
 cd ${relDir}
+#source ../../setupSLC5.sh
 eval `scramv1 ru -sh`
+echo $SCRAM_ARCH
 cd ${curDir}
 
 nEvents=-1
@@ -54,7 +56,7 @@ export failMkDestDir=""
  else 
      echo failed to define fileFormat && exit 122 
  fi
- echo Will cmsRun ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
+echo Will cmsRun -e ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
 export INPUT_FILE=${fileIn}
 #[ "x${fExt}" == "x" ] && export OUTPUT_FILE=${oDir}/${fileOut}
 #[ "x${fExt}" != "x" ] && export OUTPUT_FILE=${oDir}/${fileOut}.${fExt}
@@ -66,6 +68,7 @@ export CMS2_TAG=$6
 echo INPUT_FILE=$INPUT_FILE OUTPUT_FILE=$OUTPUT_FILE N_EVENTS=$N_EVENTS SKIP_EVENTS=$SKIP_EVENTS DATASET_NAME=$DATASET_NAME CMS2_TAG=$CMS2_TAG
 #remove igtrace if you don't like too much stack trace info
 igtrace cmsRun -e ${fileCfg} >& ${oDir}/log/${fileOut}.log
+
 executable_success=$?
 if [ $executable_success -ne 0 ]; then 
     echo cmsRun failed 

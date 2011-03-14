@@ -7,12 +7,12 @@ who=yanjuntu
 
 
 
-cmssw_release=CMSSW_3_8_6_patch1
-cms2_tag=V03-06-16
+cmssw_release=CMSSW_4_1_2
+cms2_tag=V04-00-00
 
 
 #dataset_names="`echo /Electron/Run2010B-Nov4ReReco_v1/RECO` `echo /Mu/Run2010A-Nov4ReReco_v1/RECO`"
-dataset_names="`echo /Electron/Run2010B-PromptReco-v2/RECO` "
+dataset_names="`echo /SingleMu/Run2011A-PromptReco-v1/AOD`"
 
 
 

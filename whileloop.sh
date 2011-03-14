@@ -5,14 +5,14 @@ dataset_name_1=$3
 fileFormat=$4
 who=$5
 
-cmssw_dir=`echo /code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src `
+cmssw_dir=`echo /code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src`
 
 minRunNumber=`echo 0 `
 maxRunNumber=`echo 999999 `
-config_file=`echo Data386ReReco_SDFilter_cfg.py`
-hadoop_dir=`echo /hadoop/cms/store/user/${who}/${cmssw_release}_${cms2_tag}`
+config_file=`echo Data412ReReco_SDFilter_cfg.py`
+hadoop_dir=`echo /hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}`
 express_tool_dir=` echo $PWD `
-out_dir=` echo /nfs-3/userdata/${who} `
+out_dir=`echo /nfs-4/userdata/cms2`
 [ ! -d "${hadoop_dir}" ] && echo Create ${hadoop_dir} && mkdir ${hadoop_dir}
 
 #dataset_dir_1=`echo $dataset_name_1 |sed -e 's/\/MinimumBias/MinimumBias/g;s?/?_?g' `
@@ -30,11 +30,14 @@ express_tool_subdir_1=${express_tool_dir}/${dataset_dir_1}
 [ ! -d "${express_tool_subdir_1}/merging_log" ] && echo Create ${express_tool_subdir_1}/merging_log && mkdir ${express_tool_subdir_1}/merging_log
 [ ! -d "${dataset_hadoop_dir_1}" ] && echo Create ${dataset_hadoop_dir_1} && mkdir ${dataset_hadoop_dir_1}
 unmerged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag} `
-merged_file_dir_1=`echo $out_dir/${dataset_dir_1}/${cms2_tag} `
+#merged_file_dir_1=`echo $out_dir/${dataset_dir_1}/${cms2_tag} `
+merged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag} `
 [ ! -d "$out_dir/${dataset_dir_1}" ] && echo Create  $out_dir/${dataset_dir_1} && mkdir $out_dir/${dataset_dir_1}
 [ ! -d "$out_dir/${dataset_dir_1}/${cms2_tag}" ] && echo Create $out_dir/${dataset_dir_1}/${cms2_tag} && mkdir $out_dir/${dataset_dir_1}/${cms2_tag}
 [ ! -d "$out_dir/${dataset_dir_1}/${cms2_tag}/temp" ] && echo Create $out_dir/${dataset_dir_1}/${cms2_tag}/temp && mkdir $out_dir/${dataset_dir_1}/${cms2_tag}/temp
-
+[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged
+[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag} && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}
+[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp
 #while [ 1 ]
  # do
   
