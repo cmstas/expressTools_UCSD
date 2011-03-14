@@ -1,5 +1,5 @@
 void makeSkim(const char* nmI, const char* nmO, const char* expr){
-  gSystem->Load("libMiniFWLite.so");
+  gSystem->Load("libMiniFWLite_5.27.06b-cms10.so");
   TTree::SetMaxTreeSize(39000000000ULL);
   e = new TChain("Events");
   e->Add(nmI);

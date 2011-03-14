@@ -1,16 +1,16 @@
 #allInOne.sh lines
-cmssw_release=CMSSW_3_8_6_patch1
-cms2_tag=V03-06-16
-dataset_names=/Electron/Run2010B-Nov4ReReco_v1/RECO,/Mu/Run2010A-Nov4ReReco_v1/RECO
+cmssw_release=CMSSW_4_1_2
+cms2_tag=V04-00-00
+dataset_names=/SingleMu/Run2011A-PromptReco-v1/AOD
 #whileloop.sh lines
 #CMSSWdir is optional?
 cmssw_dir=/code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src
-config_file=Data386ReReco_SDFilter_cfg.py
-hadoop_dir=/hadoop/cms/store/user/macneill/${cmssw_release}_${cms2_tag}
-#for real data make this /nfs-3/userdata/cms2
-out_dir=/nfs-4/userdata/imacneill
+config_file=Data412ReReco_SDFilter_cfg.py
+hadoop_dir=/hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}
+#for real data make this /nfs-4/userdata/cms2
+out_dir=/nfs-4/userdata/yanjuntu
 #config_file lines
 maxEvents=-1
-globaltag=FT_R_38X_V14A::All
-email=imacneill@ucsd.edu
-#user=imacneill
+globaltag=GR_P_V14::All
+email=yanjuntu@ucsd.edu
+#user=yanjuntu
