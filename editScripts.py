@@ -7,16 +7,15 @@ import sys
 def main(fileName):
     config={}
     file=open(fileName, 'r')
-    print "Reading in the configuration\n"
+    print "Reading in the configuration from %s\n"%fileName
     for line in file:
-        if "#" in line:
+        if "#" in line or line=="\n" or line==" ":
             continue
         [field,value]=line.split('=')
         field=field.strip()
         value=value.strip()
         config[field]=value
-    for key in config:
-        print "%s = %s"%(key,config[key])
+        print "%s = %s"%(field,value)
     print "\nModifying allInOne.sh"
     modifyAllInOne(config)
     print "Modifying whileloop.sh"
@@ -25,6 +24,10 @@ def main(fileName):
     modifyConfigFile(config)
     print "Modifying checkAndSubmit.sh"
     modifyCheckAndSubmit(config)
+    print "Modifying checkAndMerge.sh"
+    modifyCheckAndMerge(config)
+    print "Modifying makeSkim.C"
+    modifyMakeSkimC(config)
     
 
 def modifyAllInOne(mod_d):
@@ -82,7 +85,9 @@ def modifyConfigFile(mod_d):
     append4="process.out.fileName = cms.untracked.string(os.environ[\'OUTPUT_FILE\'])"
     append5="process.eventMaker.datasetName = cms.string(os.environ[\'DATASET_NAME\'])"
     append6="process.eventMaker.CMS2tag = cms.string(os.environ[\'CMS2_TAG\'])"
-    output.write("%s\n%s\n%s\n%s\n%s\n%s\n"%(append1,append2,append3,append4,append5,append6))
+    append7="process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(%s))"%mod_d['maxEvents']
+    output.write("%s\n%s\n%s\n%s\n%s\n%s\n%s\n"%(append1,append2,append3,append4,append5,append6,append7))
+    
 
     output.close()
 
@@ -97,9 +102,30 @@ def modifyCheckAndSubmit(mod_d):
     output.close()
 
 
+def modifyCheckAndMerge(mod_d):
+    input=open("checkAndMerge.sh").readlines()
+    output=open("checkAndMerge.sh",'w')
+    for line in input:
+        if "#" not in line:
+            if "gSystem->Load" in line and "libMiniFWLite.so" in line:
+                line="          echo -e \"void comb${rn}_${sec}(){\\n gSystem->Load(\\\"${TOOL_DIR}/%s\\\");\\n\" >> ${s}\n"%mod_d['libMiniFWLite']
+        output.write(line)
+    output.close()
+                
+
+def modifyMakeSkimC(mod_d):
+    input=open("makeSkim.C").readlines()
+    output=open("makeSkim.C", 'w')
+    for line in input:
+        if "//" not in line:
+            if "gSystem->Load(\"libMiniFWLite.so\");" in line:
+                line="  gSystem->Load(\"%s\");\n"%mod_d['libMiniFWLite']
+        output.write(line)
+    output.close()
+
+
 if __name__=="__main__":
     if sys.argv[1]:
-        print sys.argv[1]
         main(sys.argv[1])
     else:
         print "Usage: python editScripts.py [config file]"
