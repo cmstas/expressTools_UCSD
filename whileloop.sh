@@ -41,10 +41,10 @@ merged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_mer
 #while [ 1 ]
  # do
   
-  source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $fileFormat
+  #source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $fileFormat
   #sleep 5400
 
-  #source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  $merged_file_dir_1 ${minRunNumber} $maxRunNumber $fileFormat
+  source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  $merged_file_dir_1 ${minRunNumber} $maxRunNumber $fileFormat
   #sleep 5400
 #done
 

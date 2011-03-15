@@ -22,7 +22,7 @@ if [ -s "${sd_sub_dir}/a.list.dbs" ] ; then
      fi 
 else
     echo a.list.dbs is empty   
-    which mail >& /dev/null && mail -s "dbs query fails " imacneill@ucsd.edu < ${sd_sub_dir}/a.list.dbs.tmp 
+    which mail >& /dev/null && mail -s "dbs query fails " yanjuntu@ucsd.edu < ${sd_sub_dir}/a.list.dbs.tmp 
     exit 99
 fi
 
