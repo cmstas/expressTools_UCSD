@@ -65,25 +65,22 @@ if (( nToSub > 0 )) ; then
 	#the output file will be a legal version of the inputFile name with : and / replaced by _ (see the script)
 
 cat > expressTools_UCSD_${sd_sub_dir}.cmd <<@EOF
-universe=grid
-Grid_Resource=gt2 osg-gw-4.t2.ucsd.edu:/jobmanager-condor
+universe=vanilla
 executable=$PWD/runFromOneCfg_noEvCheck.sh
-stream_output = False
-stream_error  = False
-WhenToTransferOutput = ON_EXIT
+arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $fileFormat
+transfer_executable=True
+when_to_transfer_output = ON_EXIT
 #the actual executable to run is not transfered by its name.
 #In fact, some sites mya do weird things like renaming it and such.
-#transfer_input_files = /home/users/yanjuntu/CMS/condor/job.sh
-transfer_input_files = $PWD/${config_file}
-transfer_Output_files = 
-log    = /tmp/uselesslog-yanjuntu_${sd_sub_dir}.log
-Notification = Never 
+transfer_input_files = $PWD/${config_file} 
++DESIRED_Sites="UCSD" 
 +Owner = undefined 
-	
-arguments=$release_dir $config_file $input_data $output_dir $sd_dataset_name $cms2_tag $input_data_run $fileFormat
+log=/tmp/uselesslog-yanjuntu_${sd_sub_dir}.log
 output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
-queue
+notification=Never
+x509userproxy=$ENV(X509_USER_PROXY)	
+queue 10
 	
 @EOF
 	
