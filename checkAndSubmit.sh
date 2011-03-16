@@ -80,7 +80,7 @@ output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 notification=Never
 x509userproxy=$ENV(X509_USER_PROXY)	
-queue 10
+queue
 	
 @EOF
 	
