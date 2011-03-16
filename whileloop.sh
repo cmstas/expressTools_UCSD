@@ -3,13 +3,13 @@ cmssw_release=$1
 cms2_tag=$2
 dataset_name_1=$3
 fileFormat=$4
-who=$5
+
 
 cmssw_dir=`echo /code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src`
 
 minRunNumber=`echo 0 `
 maxRunNumber=`echo 999999 `
-config_file=`echo Data412ReReco_SDFilter_cfg.py`
+config_file=`echo Data398ReReco_SDFilter_cfg.py`
 hadoop_dir=`echo /hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}`
 express_tool_dir=` echo $PWD `
 out_dir=`echo /nfs-4/userdata/cms2`
@@ -38,13 +38,13 @@ merged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_mer
 [ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged
 [ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag} && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}
 [ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp
-#while [ 1 ]
- # do
+while [ 1 ]
+  do
   
-  #source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $fileFormat
-  #sleep 5400
+  source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $fileFormat
+  sleep 5400
 
   source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  $merged_file_dir_1 ${minRunNumber} $maxRunNumber $fileFormat
-  #sleep 5400
-#done
+  sleep 5400
+done
 

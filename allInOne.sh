@@ -3,16 +3,16 @@ export VDT_LOCATION=/data/vdt
 export EDG_WL_LOCATION=$VDT_LOCATION/edg
 source /data/vdt/setup.sh 
 fileFormat="`echo prompt` "
-who=yanjuntu
 
 
 
-cmssw_release=CMSSW_4_1_2
-cms2_tag=V04-00-00
+
+cmssw_release=CMSSW_4_1_2_patch1
+cms2_tag=V04-00-05
 
 
 #dataset_names="`echo /Electron/Run2010B-Nov4ReReco_v1/RECO` `echo /Mu/Run2010A-Nov4ReReco_v1/RECO`"
-dataset_names="`echo /SingleMu/Run2011A-PromptReco-v1/AOD`"
+dataset_names="`echo /DoubleElectron/Run2011A-PromptReco-v1/AOD` `echo /DoubleMu/Run2011A-PromptReco-v1/AOD` `echo /MuEG/Run2011A-PromptReco-v1/AOD`"
 
 
 
