@@ -57,7 +57,7 @@ if (( nToSub > 0 )) ; then
     subLog=sub.log.${dateS}
     grep store ${sd_sub_dir}/a.list.new | while read -r rn f; do 
 	release_dir=`echo $dir_gw2 `
-	input_data=`echo file:/hadoop/cms/phedex$f `
+	input_data=`echo root://xrootd.unl.edu/$f `
 	#extention=`echo v0 `
 	input_data_run=`echo $rn`
 	

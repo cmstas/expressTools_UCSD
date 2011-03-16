@@ -48,11 +48,11 @@ export failMkDestDir=""
 [ ! -d "${oDir}/xml" ] && echo Create ${oDir}/xml && mkdir ${oDir}/xml
 
  input_data_Run=$7
- 
+ #files start with root://xrootd.unl.edu//store... using the xrootd system
  if [ "${fileFormat}" == "prompt"  ]; then
-     fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/file__//g'` ##replace / or : by _; and remove file__
+     fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
  elif [ "${fileFormat}" == "reco"  ]; then
-     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/file__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove file__
+     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
  else 
      echo failed to define fileFormat && exit 122 
  fi
