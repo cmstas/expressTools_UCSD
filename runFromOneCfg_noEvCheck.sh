@@ -94,7 +94,8 @@ if [ $nRootFile -gt 1 }; then
     exit 48
 fi
 
-find ./ -type f | while read -r f; do 
+#find ./ -type f | while read -r f; do 
+find ./  -iname \*.root  -or -iname \*.log -or -iname \*.xml -type f | while read -r f; do  
     echo "doing lcg-cp"
     lcg-cp -b -D srmv2 --vo cms -t 2400 --verbose file:`pwd`/${f}  srm://bsrm-1.t2.ucsd.edu:8443/srm/v2/server?SFN=$outputDir/${f}
     stage_out_code=$?
