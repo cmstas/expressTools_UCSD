@@ -5,6 +5,7 @@ minRun=$4
 maxRun=$5
 
 fileFormat=$6
+mrgDest_hadoop=$7
 
 TOOL_DIR=$PWD
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
@@ -23,11 +24,11 @@ cp ${submitDir}/a.runs.list.tmp runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
     if [ "${fileFormat}" == "reco" ]; then
-	 f=`echo $fr | cut -d"_" -f12 `
+	 f=`echo $fr | cut -d"_" -f9 `
 	 run=`grep  $f runs.all.express | awk '{print $1}'`
 	 (( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     elif [ "${fileFormat}" == "prompt" ]; then
-	f=`echo $fr | cut -d"_" -f13 ` 
+	f=`echo $fr | cut -d"_" -f10 ` 
 	run=`grep  $f runs.all.express | awk '{print $1}'`
 	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     else
@@ -37,7 +38,8 @@ cat files.ls | while read -r fr; do
 done > files.runs.ls
 grep -v ^[1-9]  files.runs.ls >& /dev/null && echo Corrupt  files.runs.ls && exit 33
 
-grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
+grep store files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
+#grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
     if [ ! -d "${rn}" ] ; then 
 	mkdir ${rn}
 	rnL=`echo ${rn} | cut -c1-3`
@@ -46,7 +48,8 @@ grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do
 	#mkdir ${dc}/${rnL}/${rnR}
     fi
 done
-grep _cms files.runs.ls | while read -r rn fo fr; do 
+grep store files.runs.ls | while read -r rn fo fr; do 
+#grep _cms files.runs.ls | while read -r rn fo fr; do 
     if [ ! -h "$rn/$fr" ] ; then
 	ln -s ${dc}/${fr} ${rn}/${fr}
 	sleep 1
@@ -149,14 +152,14 @@ ls -d 1[3-9]* | while read -r rn; do
 	    echo "New/updated end merge ${scriptC} " 
 	
 	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite_5.27.06b-cms10.so\");\n" >> ${s}
-	    echo -e "\n\tTTree::SetMaxTreeSize(39000000000);" >> ${s}
+	    echo -e "\n\tTTree::SetMaxTreeSize(99000000000);" >> ${s}
 	    echo -e "\n\te = new TChain(\"Events\");\n "  >> ${s}
 	fi
 	echo -e "\n\te->Add(\"${rn}/${f}\");">> ${s}
 	(( curCount++ ))
 	closeC="NO"
 	#(( curCount == 100 || cTot == 0 ))  && closeC="YES"
-	(( curCount == 10 || cTot == 0 ))  && closeC="YES"
+	(( curCount == 20 || cTot == 0 ))  && closeC="YES"
 #  echo ${curCount} ${cTot} closeC ${closeC}
 	if [ "${closeC}" == "YES" ] ; then
 	    echo -e "\n\te->Merge(\"${mrgDest}/temp/merged_ntuple_${rn}_${sec}_ready.root\",\"fast\");\n}" >> ${s}
@@ -205,7 +208,7 @@ cat merge.list | grep C$ | while read -r f ;  do
     fDest=`grep Merge ${nC} | tr '\"' '\n' | grep _ready`
     if [ "x${fDest}" == "x" ] ; then
 	echo "Corrupt ${nC}"
-
+	rm ${fDest}
 	exit 38
 
     fi
@@ -215,6 +218,17 @@ cat merge.list | grep C$ | while read -r f ;  do
 	mv ${fDest} ${fDGood}
 	mv ${nC} ${oC}
 	chmod a-w ${oC}
+	fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${mrgDest}?\${mrgDest_hadoop}?g;s?/hadoop??g"` 
+	echo ${fDGood}
+	echo ${mrgDest}
+	echo ${mrgDest_hadoop}
+	echo ${fDGood_hadoop}
+	hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
+	
+	copyE="$?"
+	[ "$copyE" != 0 ] && rm ${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
+        [ "$copyE" == 0 ] && rm ${fDGood}
+	
     fi
 done >& merging_log/merging.log.`date '+\%Y.\%m.\%d-\%H.\%M.\%S'`
 #now move done files to merged
