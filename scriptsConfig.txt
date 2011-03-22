@@ -1,9 +1,9 @@
 ### allInOne.sh lines ###
 cmssw_release=CMSSW_4_1_2_patch1
-cms2_tag=V04-00-08
+cms2_tag=V04-00-13
 dataset_names=/DoubleMu/Run2011A-PromptReco-v1/AOD, /DoubleElectron/Run2011A-PromptReco-v1/AOD, /MuEG/Run2011A-PromptReco-v1/AOD
 ### whileloop.sh lines ###
-cmssw_dir=/code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src
+cmssw_dir=/code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src  # don't change
 config_file=Data412ReReco_SDFilter_cfg.py
 hadoop_dir=/hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}
 #for real data make this /nfs-4/userdata/cms2
@@ -16,3 +16,4 @@ email=yanjuntu@physics.ucsd.edu
 #              and             #
 ###   makeSkim.C lines       ###    
 libMiniFWLite=libMiniFWLite_5.27.06b-cms10.so
+tmp_merged_dir=/data/tmp/yanjuntu 
