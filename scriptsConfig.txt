@@ -1,16 +1,16 @@
 ### allInOne.sh lines ###
 cmssw_release=CMSSW_4_1_2_patch1
-cms2_tag=V04-00-06
+cms2_tag=V04-00-08
 dataset_names=/DoubleMu/Run2011A-PromptReco-v1/AOD, /DoubleElectron/Run2011A-PromptReco-v1/AOD, /MuEG/Run2011A-PromptReco-v1/AOD
 ### whileloop.sh lines ###
 cmssw_dir=/code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src
-config_file=Data398ReReco_SDFilter_cfg.py
+config_file=Data412ReReco_SDFilter_cfg.py
 hadoop_dir=/hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}
 #for real data make this /nfs-4/userdata/cms2
 out_dir=/nfs-4/userdata/cms2
 ### config_file lines ###
 maxEvents=-1
-globaltag=GR_P_V14::All
+globaltag=GR_R_311_V2::All
 email=yanjuntu@physics.ucsd.edu
 ###   checkAndMerge.sh lines ###
 #              and             #

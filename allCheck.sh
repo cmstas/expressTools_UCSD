@@ -2,22 +2,22 @@
 export VDT_LOCATION=/data/vdt
 export EDG_WL_LOCATION=$VDT_LOCATION/edg
 source /data/vdt/setup.sh 
-cmssw_release=CMSSW_3_8_6_patch1
 
-cms2_tag=V03-06-16
+mssw_release=CMSSW_4_1_2_patch1
+cms2_tag=V04-00-08
 
-dataset_name_1=`echo /Electron/Run2010B-Nov4ReReco_v1/RECO `
-dataset_name_2=`echo /Mu/Run2010A-Nov4ReReco_v1/RECO `
+
+
+dataset_names="`echo /DoubleMu/Run2011A-PromptReco-v1/AOD` `echo /DoubleElectron/Run2011A-PromptReco-v1/AOD` `echo /MuEG/Run2011A-PromptReco-v1/AOD`"
+#dataset_names="`echo /DoubleElectron/Run2011A-PromptReco-v1/AOD`"                                                                                                 
 
 
 
 while [ 1 ]
   do
-
-
-  source checkFailedJobs.sh $dataset_name_1 $cms2_tag >& /dev/null
-  source checkFailedJobs.sh $dataset_name_2 $cms2_tag >& /dev/null
-
-
-  sleep 7200
+  for dataset_name in $dataset_names; do
+      source checkFailedJobs.sh $dataset_name $cms2_tag >& /dev/null
+  done
+ 
+  sleep 6600
 done 

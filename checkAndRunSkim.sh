@@ -2,10 +2,10 @@ cmssw_release=$1
 cms2_tag=$2
 dataset_name=$3
 #merged_dir=` echo /nfs-3/userdata/cms2 `
-merged_dir=` echo /hadoop/cms/store/user/yanjuntu/CMSSW_4_1_2_V04-00-00 ` #change
+merged_dir=` echo /hadoop/cms/store/user/yanjuntu/CMSSW_4_1_2_patch1_V04-00-08 ` #change
 dataset_dir_tmp=`echo $dataset_name |sed -e 's?/?_?g' `
 dataset_dir=`echo ${dataset_dir_tmp:1} `
-merged_file_dir=`echo $merged_dir/${dataset_dir}/CMSSW_4_1_2_V04-00-00_merged/${cms2_tag} ` #change
+merged_file_dir=`echo $merged_dir/${dataset_dir}/CMSSW_4_1_2_patch1_V04-00-08_merged/${cms2_tag} ` #change
 
 out_dir_0=` echo /nfs-4/userdata/cms2/${dataset_dir} ` 
 out_dir=` echo ${out_dir_0}/${cms2_tag} ` 
