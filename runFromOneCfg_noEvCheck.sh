@@ -72,7 +72,7 @@ igtrace cmsRun -e ${fileCfg} >& ${oDir}/log/${fileOut}.log
 executable_success=$?
 if [ $executable_success -ne 0 ]; then 
     echo cmsRun failed 
-    cat  ${oDir}/${fileOut}.log
+    cat  ${oDir}/log/${fileOut}.log
     exit 47
 fi
 cat ${oDir}/${fileOut}.log
