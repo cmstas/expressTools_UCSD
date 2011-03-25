@@ -35,7 +35,7 @@ nToSub=`grep -c store a.list.new.resubmit `
 if (( nToSub > 0 )) ; then
     dateS=`date '+%Y.%m.%d-%H.%M.%S'`
     subLog=sub.log.${dateS}
-    cp ../expressTools_UCSD_${dataset_dir}.cmd expressTools_UCSD_${dataset_dir}_resubmit.cmd
+    'cp' ../expressTools_UCSD_${dataset_dir}.cmd expressTools_UCSD_${dataset_dir}_resubmit.cmd
     grep store a.list.new.resubmit | while read -r rn f; do 
 	input_data=`echo root://xrootd.unl.edu/$f `
 	python ../resubmit.py expressTools_UCSD_${dataset_dir}_resubmit.cmd $f
