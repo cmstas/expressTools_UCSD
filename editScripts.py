@@ -64,7 +64,7 @@ def modifyWhileLoop(mod_d):
                 line="out_dir=`echo %s`\n"%mod_d['out_dir']
             if "tmp_merged_dir=" in line:
                 line="tmp_merged_dir=`echo %s`\n"%mod_d['tmp_merged_dir']
-            output.write(line)
+        output.write(line)
     output.close()
 
 
