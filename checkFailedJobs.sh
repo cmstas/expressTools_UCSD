@@ -38,7 +38,8 @@ if (( nToSub > 0 )) ; then
     'cp' ../expressTools_UCSD_${dataset_dir}.cmd expressTools_UCSD_${dataset_dir}_resubmit.cmd
     grep store a.list.new.resubmit | while read -r rn f; do 
 	input_data=`echo root://xrootd.unl.edu/$f `
-	python ../resubmit.py expressTools_UCSD_${dataset_dir}_resubmit.cmd $f
+	python ../resubmit.py expressTools_UCSD_${dataset_dir}_resubmit.cmd ${input_data}
+	echo ${input_data}
 	cd ${cur_dir}
 	condor_submit ${dataset_dir}/expressTools_UCSD_${dataset_dir}_resubmit.cmd
 	cd ${cur_dir}/${dataset_dir}
