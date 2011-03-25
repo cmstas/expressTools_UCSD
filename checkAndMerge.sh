@@ -226,17 +226,17 @@ cat merge.list | grep C$ | while read -r f ;  do
 	hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
 	
 	copyE="$?"
-	[ "$copyE" != 0 ] && rm /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
+	[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
        
 	fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
 	fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
 	echo source file $fSize_in
 	echo destination file $fSize_out
 	if [ "$fSize_in" -ne  "$fSize_out" ]; then
-	    rm /hadoop${fDGood_hadoop}
+	    'rm' /hadoop${fDGood_hadoop}
 	    hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
 	elif [ "$fSize_in" ==  "$fSize_out" ]; then 
-	    rm ${fDGood}
+	    'rm' ${fDGood}
 	else
 	    echo Error while copying from /data/tmp to hadoop && exit 59 
 	fi
