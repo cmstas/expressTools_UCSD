@@ -5,6 +5,10 @@ dataset_dir_tmp=`echo $dataset_name |sed -e 's?/?_?g' `
 dataset_dir=`echo ${dataset_dir_tmp:1} ` 
 log_dir=`echo /home/users/yanjuntu/public_html/prompt_ntuple_log `
 hadoop_dir=`echo /hadoop/cms/phedex `
+cmssw_rel=$3
+who=$4 
+fjr2json.py /hadoop/cms/store/user/$who/${cmssw_rel}_${cms2_tag}/${dataset_dir}/${cmssw_rel}_${cms2_tag}/xml/*.xml >& $log_dir/${dataset_dir}_json
+
 cd ${dataset_dir}
 
 cat a.list  > submit.list
