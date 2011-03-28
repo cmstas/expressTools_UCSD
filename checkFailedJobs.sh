@@ -22,7 +22,9 @@ f_hadoop=`echo $hadoop_dir$f `
 
 if [ ! -s "$f_hadoop" ]; then
     echo $rn $f
-elif test `find "$f_hadoop" -mmin +1200`; then
+done >& $log_dir/${dataset_dir}_missing_files_20h_non_ucsd
+    
+if [ -s "$f_hadoop" ] && test `find "$f_hadoop" -mmin +1200`; then
     echo $rn $f
 fi
 done >& $log_dir/${dataset_dir}_missing_files_20h
@@ -50,8 +52,10 @@ if (( nToSub > 0 )) ; then
     done >& submitting_log/${subLog}
 fi
 
-[ ! -d "$log_dir/error" ] && mkdir $log_dir/error
-chmod 777 $log_dir/error
+[ ! -d "$log_dir/error" ] && mkdir $log_dir/error && chmod 777 $log_dir/error
+[ ! -d "$log_dir/mismerging" ] && mkdir $log_dir/mismerging && chmod 777 $log_dir/mismerging
+
+
 
 echo $dataset_name
 wc -l submit.list
@@ -60,8 +64,9 @@ cat $log_dir/${dataset_dir}_missing_files
 echo merge Error
 ls -d merging_log/merging*| while read -r f; do
      cat ${f} |grep "Error"
-done | uniq >&$log_dir/error/${dataset_dir}_merging_error 
+     done | uniq >&$log_dir/error/${dataset_dir}_merging_error 
 
+echo $PWD
 cat grouped.list |grep .root | while read -r f; do
     grep $f oldC/*.C >& /dev/null || echo "$f is not in merge";
 done >& ${log_dir}/mismerging/${dataset_dir}_mismerging
@@ -69,7 +74,8 @@ done >& ${log_dir}/mismerging/${dataset_dir}_mismerging
 cd ../
 
 echo skim Error
-[ -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/skim_log" ] && ls -d /nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/skim_log/*log* |while read -r f; do
+ls /nfs-4/userdata/cms2 >& /dev/null
+[ -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/tagAndProbeSkim/skim_log" ] && ls -d /nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/tagAndProbeSkim/skim_log/*log* |while read -r f; do
     cat ${f}|grep "Error"
-done | uniq >&$log_dir/error/${dataset_dir}_skimming_error
+    done | uniq >&$log_dir/error/${dataset_dir}_skimming_error
 [ ! -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/skim_log" ] && echo did no find skim log
