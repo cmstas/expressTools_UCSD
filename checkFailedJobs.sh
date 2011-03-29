@@ -22,12 +22,22 @@ f_hadoop=`echo $hadoop_dir$f `
 
 if [ ! -s "$f_hadoop" ]; then
     echo $rn $f
+fi
 done >& $log_dir/${dataset_dir}_missing_files_20h_non_ucsd
-    
-if [ -s "$f_hadoop" ] && test `find "$f_hadoop" -mmin +1200`; then
-    echo $rn $f
+
+
+
+
+cat $log_dir/${dataset_dir}_missing_files| while read -r rn f; do
+f_hadoop=`echo $hadoop_dir$f `
+
+if [ -s "$f_hadoop" ]; then
+    if test `find "$f_hadoop" -mmin +1200`; then
+        echo $rn $f
+    fi
 fi
 done >& $log_dir/${dataset_dir}_missing_files_20h
+
 
 [ ! -f "a.list.resubmit" ]  && echo Create a.list.resubmit && touch a.list.resubmit
 cat $log_dir/${dataset_dir}_missing_files_20h |grep .root > a.runs.list0.tmp.resubmit
