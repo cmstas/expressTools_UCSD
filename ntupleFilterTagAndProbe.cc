@@ -133,7 +133,6 @@ void ntupleFilterTagAndProbe (const std::string &infile, const std::string &outf
         cms2.Init(newtree);
         cms2.Init(tree);
 
-        if (nEventsTotal > 10000) continue;
 
         // Event Loop
         const unsigned int nEvents = tree->GetEntries();
