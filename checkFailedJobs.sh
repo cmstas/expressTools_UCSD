@@ -87,5 +87,12 @@ echo skim Error
 ls /nfs-4/userdata/cms2 >& /dev/null
 [ -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/tagAndProbeSkim/skim_log" ] && ls -d /nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/tagAndProbeSkim/skim_log/*log* |while read -r f; do
     cat ${f}|grep "Error"
-    done | uniq >&$log_dir/error/${dataset_dir}_skimming_error
+    done | uniq >&$log_dir/error/${dataset_dir}_tagAndProbeSkim_error
+[ -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/DoubleMuTriggerSkim/skim_log" ] && ls -d /nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/DoubleMuTrigger/skim_log/*log* |while read -r f; do
+    cat ${f}|grep "Error"
+done | uniq >&$log_dir/error/${dataset_dir}_DoubleMuTrigger_error
+[ -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/DoubleElectronTriggerSkim/skim_log" ] && ls -d /nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/DoubleElectronTrigger/skim_log/*log* |while read -r f; do
+    cat ${f}|grep "Error"
+done | uniq >&$log_dir/error/${dataset_dir}_DoubleElectronTrigger_error
+
 [ ! -d "/nfs-4/userdata/cms2/$dataset_dir/$cms2_tag/skim_log" ] && echo did no find skim log

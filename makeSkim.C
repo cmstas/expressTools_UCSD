@@ -9,6 +9,14 @@ void makeSkim(const char* nmI, const char* nmO, const char* expr=""){
       gROOT->LoadMacro("ntupleFilterTagAndProbe.cc++");
       ntupleFilterTagAndProbe(nmI, nmO);
     }
+    if (expr=="DoubleElectronTrigger"){
+      gROOT->LoadMacro("ntupleFilterDoubleElectronTrigger.cc++");
+      ntupleFilterTagAndProbe(nmI, nmO);
+    }
+    if (expr=="DoubleMuTrigger"){
+      gROOT->LoadMacro("ntupleFilterDoubleMuTrigger.cc++");
+      ntupleFilterTagAndProbe(nmI, nmO);
+    }
   }
   //  
   //e = new TChain("Events");
