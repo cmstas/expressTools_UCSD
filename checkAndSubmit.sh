@@ -11,7 +11,7 @@ TOOL_DIR=./
 fileFormat=$9
 
 python getLFNList_reco.py --dataset=${sd_dataset_name}|grep .root  > ${sd_sub_dir}/a.runs.list.tmp.phedex
-if [ -s "${sd_sub_dir}/a.runs.list.tmp.phedex" ]; then
+if [ "${fileFormat}" == "reco" ]; then
     dbs search --production --query="find file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs    
 elif [ "${fileFormat}" == "prompt" ]; then
     dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
