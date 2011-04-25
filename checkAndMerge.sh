@@ -24,7 +24,7 @@ cp ${submitDir}/a.runs.list.tmp runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
     if [ "${fileFormat}" == "reco" ]; then
-	 f=`echo $fr | cut -d"_" -f9 `
+	 f=`echo $fr | cut -d"_" -f8 `
 	 run=`grep  $f runs.all.express | awk '{print $1}'`
 	 (( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     elif [ "${fileFormat}" == "prompt" ]; then
@@ -74,7 +74,7 @@ ls newC/ | grep C$ | while read -r c; do
 #    chmod a-w ${oC}
 done
 mrgDest=$3
-ls -d 1[3-9]* | while read -r rn; do
+ls -d [1-9]* | while read -r rn; do
     (( rn < minRun )) && (( rn > maxRun )) && continue
 #    echo Checking $rn
     count=0 
@@ -159,7 +159,7 @@ ls -d 1[3-9]* | while read -r rn; do
 	(( curCount++ ))
 	closeC="NO"
 	#(( curCount == 100 || cTot == 0 ))  && closeC="YES"
-	(( curCount == 20 || cTot == 0 ))  && closeC="YES"
+	(( curCount == 50 || cTot == 0 ))  && closeC="YES"
 #  echo ${curCount} ${cTot} closeC ${closeC}
 	if [ "${closeC}" == "YES" ] ; then
 	    echo -e "\n\te->Merge(\"${mrgDest}/temp/merged_ntuple_${rn}_${sec}_ready.root\",\"fast\");\n}" >> ${s}
