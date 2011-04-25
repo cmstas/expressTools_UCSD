@@ -11,14 +11,24 @@ TOOL_DIR=./
 fileFormat=$9
 
 python getLFNList_reco.py --dataset=${sd_dataset_name}|grep .root  > ${sd_sub_dir}/a.runs.list.tmp.phedex
-dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
+if [ -s "${sd_sub_dir}/a.runs.list.tmp.phedex" ]; then
+    dbs search --production --query="find file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs    
+elif [ "${fileFormat}" == "prompt" ]; then
+    dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
+fi
 
 if [ -s "${sd_sub_dir}/a.list.dbs" ] ; then
      if [ -s "${sd_sub_dir}/a.runs.list.tmp.phedex" ]; then 
          #cat ${sd_sub_dir}/a.runs.list.tmp.phedex|grep .root|awk '{print $2}' | while read -r f; do
-	 cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r rn f; do
-             grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo $rn $f  
-         done  &> ${sd_sub_dir}/a.runs.list.tmp 
+	 if [ "${fileFormat}" == "reco" ]; then
+	     cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r f; do
+                 grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo 999999 $f
+             done  &> ${sd_sub_dir}/a.runs.list.tmp
+	 elif [ "${fileFormat}" == "prompt" ]; then
+	     cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r rn f; do
+		 grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo $rn $f  
+	     done  &> ${sd_sub_dir}/a.runs.list.tmp 
+	 fi
      fi 
 else
     echo a.list.dbs is empty   
@@ -79,7 +89,8 @@ log=/tmp/uselesslog-yanjuntu_${sd_sub_dir}.log
 output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 notification=Never
-x509userproxy=$ENV(X509_USER_PROXY)	
+#x509userproxy=$ENV(X509_USER_PROXY)	
+x509userproxy=/tmp/x509up_u31057
 queue
 	
 @EOF
