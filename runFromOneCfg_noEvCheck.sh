@@ -75,7 +75,7 @@ if [ $executable_success -ne 0 ]; then
     cat  ${oDir}/log/${fileOut}.log
     exit 47
 fi
-cat ${oDir}/${fileOut}.log
+cat ${oDir}/log/${fileOut}.log
 xmlfileOut=`echo $fileOut | sed -e 's?.root??g'`
 mv FrameworkJobReport.xml ${oDir}/xml/${xmlfileOut}.xml
 echo Almost Done  at `date`
