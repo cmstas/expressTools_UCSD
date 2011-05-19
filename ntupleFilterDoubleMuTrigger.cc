@@ -58,13 +58,14 @@ bool select (bool isData)
       TRegexp reg(Form("%s", pattern.Data()), true);
       if (sname.Index(reg) >= 0 ) {
 	HLTTrigger= name;
+	if ( cms2.passHLTTrigger(HLTTrigger) ) return true;
       }
     }
   }
   // cout <<"hlt tigger " <<HLTTrigger<<endl;
        
   // Did the trigger pass?
-  if ( cms2.passHLTTrigger(HLTTrigger) ) return true;
+  //  if ( cms2.passHLTTrigger(HLTTrigger) ) return true;
   
   return false;
 
