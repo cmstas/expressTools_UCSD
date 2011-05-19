@@ -44,20 +44,24 @@ bool select (bool isData)
   vector<TString>::iterator hltBegin=hlt_trigNames().begin();
   vector<TString>::iterator hltEnd=hlt_trigNames().end();    
   TString HLTTrigger; 
+  std::vector<std::string> trigNames;
+  trigNames.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*");
+  trigNames.push_back("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*");
   for(hltIter=hltBegin; hltIter!=hltEnd; hltIter++){
     
     TString name = (*hltIter);
-    TString pattern("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*");
-    TString sname(name);
-    sname.ToLower();
-    pattern.ToLower();
-    TRegexp reg(Form("%s", pattern.Data()), true);
-    if (sname.Index(reg) >= 0 ) {
-      HLTTrigger= name;
+    for(unsigned int j = 0; j < trigNames.size(); j++) {
+      TString pattern(trigNames.at(j));
+      TString sname(name);
+      sname.ToLower();
+      pattern.ToLower();
+      TRegexp reg(Form("%s", pattern.Data()), true);
+      if (sname.Index(reg) >= 0 ) {
+	HLTTrigger= name;
+      }
     }
-	
   }
-  cout <<"hlt tigger " <<HLTTrigger<<endl;
+  // cout <<"hlt tigger " <<HLTTrigger<<endl;
        
   // Did the trigger pass?
   if ( cms2.passHLTTrigger(HLTTrigger) ) return true;
