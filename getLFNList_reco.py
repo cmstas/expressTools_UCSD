@@ -29,12 +29,12 @@ for block in result['phedex']['block']:
     for filelist in block['file'] :
         #print filelist['name']
         for replica in filelist['replica'] :
-            #if replica['node']=="T2_US_UCSD"  :
-            lfn=filelist['name']
-            #a1=os.path.dirname(lfn)
-            #s1=os.path.basename(a1)
-            #a2=os.path.dirname(a1)
-            #s2=os.path.basename(a2)
-            #run_number = int(s2+s1)
-            #if run_number >= low_run and run_number <= high_run:
-            print filelist['name']
+            if replica['node']=="T2_US_UCSD" or replica['node']=="T2_US_Nebraska" or replica['node']=="T2_US_Caltech" or replica['node']=="T2_US_Wisconsin" or replica['node']=="T2_US_Florida" or replica['node']=="T2_US_Purdue" or replica['node']=="T1_US_FNAL_Buffer" or replica['node']=="T1_US_FNAL_MSS"  :
+                lfn=filelist['name']
+                #a1=os.path.dirname(lfn)
+                #s1=os.path.basename(a1)
+                #a2=os.path.dirname(a1)
+                #s2=os.path.basename(a2)
+                #run_number = int(s2+s1)
+                #if run_number >= low_run and run_number <= high_run:
+                print filelist['name']
