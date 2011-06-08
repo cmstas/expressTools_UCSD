@@ -17,6 +17,11 @@ void makeSkim(const char* nmI, const char* nmO, const char* expr=""){
       gROOT->LoadMacro("ntupleFilterDoubleMuTrigger.cc++");
       ntupleFilterTagAndProbe(nmI, nmO);
     }
+    if (expr=="SingleMu"){
+      gROOT->LoadMacro("ntupleFilterDilepPt2010.cc++");
+      ntupleFilterTagAndProbe(nmI, nmO);
+
+    }
   }
   //  
   //e = new TChain("Events");
