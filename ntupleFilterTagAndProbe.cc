@@ -12,6 +12,11 @@
 #include "../CORE/electronSelectionsParameters.cc"
 #include "../CORE/muonSelections.cc"
 
+//#include "./CORE/CMS2.cc"
+//#include "./CORE/electronSelections.cc"
+//#include "./CORE/electronSelectionsParameters.cc"
+//#include "./CORE/muonSelections.cc"
+
 #include "Rtypes.h"
 typedef ULong64_t uint64;
 
@@ -52,7 +57,7 @@ bool select (bool isData)
         //
 
         // electron case
-        cuts_t electron_tag = ((1ll<<ELEISO_REL015) | (1ll<<ELEID_VBTF_35X_70));
+        cuts_t electron_tag = ((1ll<<ELEISO_REL015) | (1ll<<ELEID_VBTF_80_NOHOEEND));
         if (abs(cms2.hyp_lt_id()[i]) == 11) {
             cuts_t cuts_passed = electronSelection(cms2.hyp_lt_index()[i]);
             if (((cuts_passed & electron_tag) == electron_tag) && cms2.hyp_lt_p4()[i].pt() > 20.0) return true;
@@ -80,6 +85,7 @@ void ntupleFilterTagAndProbe (const std::string &infile, const std::string &outf
 {
     // set good run list
     //if (runlist != "") set_goodrun_file(runlist.c_str());
+
 
     // output file and tree
     TFile *output =TFile::Open(outfile.c_str(), "RECREATE");
