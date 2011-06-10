@@ -11,9 +11,7 @@
 //#include "../Tools/goodrun.cc"
 
 #include "../CORE/CMS2.cc"
-#include "../CORE/electronSelections.cc"
-#include "../CORE/electronSelectionsParameters.cc"
-#include "../CORE/muonSelections.cc"
+
 
 #include "Rtypes.h"
 typedef ULong64_t uint64;
