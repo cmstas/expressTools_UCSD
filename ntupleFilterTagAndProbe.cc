@@ -8,8 +8,12 @@
 //#include "../Tools/goodrun.cc"
 
 #include "../CORE/CMS2.cc"
-#include "../CORE/electronSelections.cc"
+#include "../CORE/utilities.cc"
+#include "../CORE/trackSelections.cc"
+#include "../CORE/eventSelections.cc"
+#include "../CORE/MITConversionUtilities.cc"
 #include "../CORE/electronSelectionsParameters.cc"
+#include "../CORE/electronSelections.cc"
 #include "../CORE/muonSelections.cc"
 
 //#include "./CORE/CMS2.cc"
