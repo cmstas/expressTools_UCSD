@@ -45,6 +45,7 @@ bool select (bool isData)
   std::vector<std::string> trigNames;
   trigNames.push_back("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*");
   trigNames.push_back("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*");
+  trigNames.push_back("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v*");
   for(hltIter=hltBegin; hltIter!=hltEnd; hltIter++){
     
     TString name = (*hltIter);
