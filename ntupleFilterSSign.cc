@@ -170,8 +170,6 @@ void ntupleFilterSSign (const std::string &infile, const std::string &outfile, b
      const long long max_tree_size = 20000000000000000LL;
      TTree::SetMaxTreeSize(max_tree_size);
 
-	 TTree::SetMaxTreeSize();
-
 	 FILE *log = 0; //for keeping any output desired on selection
 	 if( printPass ) {
 		  size_t pos = outfile.find(".root");
