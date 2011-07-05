@@ -47,15 +47,18 @@ export failMkDestDir=""
 [ ! -d "${oDir}/log" ] && echo Create ${oDir}/log && mkdir ${oDir}/log
 [ ! -d "${oDir}/xml" ] && echo Create ${oDir}/xml && mkdir ${oDir}/xml
 
- input_data_Run=$7
- #files start with root://xrootd.unl.edu//store... using the xrootd system
- if [ "${fileFormat}" == "prompt"  ]; then
-     fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
- elif [ "${fileFormat}" == "reco"  ]; then
-     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
- else 
-     echo failed to define fileFormat && exit 122 
- fi
+input_data_Run=$7
+#files start with root://xrootd.unl.edu//store... using the xrootd system
+if [ "${fileFormat}" == "prompt"  ]; then
+    fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
+elif [ "${fileFormat}" == "reco"  ]; then
+    fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
+elif [ "${fileFormat}" == "mc"  ]; then
+    fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
+else 
+    echo failed to define fileFormat && exit 122 
+fi
+
 echo Will cmsRun -e ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
 export INPUT_FILE=${fileIn}
 #[ "x${fExt}" == "x" ] && export OUTPUT_FILE=${oDir}/${fileOut}

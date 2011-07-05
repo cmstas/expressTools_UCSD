@@ -15,20 +15,26 @@ if [ "${fileFormat}" == "reco" ]; then
     dbs search --production --query="find file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs    
 elif [ "${fileFormat}" == "prompt" ]; then
     dbsql "find run, file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
+elif [ "${fileFormat}" == "mc" ]; then
+    dbs search --production --query="find file where file.status=VALID and dataset=$sd_dataset_name and  run >=${min_run} and run <=${max_run} " |grep store/ >  ${sd_sub_dir}/a.list.dbs
 fi
 
 if [ -s "${sd_sub_dir}/a.list.dbs" ] ; then
      if [ -s "${sd_sub_dir}/a.runs.list.tmp.phedex" ]; then 
          #cat ${sd_sub_dir}/a.runs.list.tmp.phedex|grep .root|awk '{print $2}' | while read -r f; do
-	 if [ "${fileFormat}" == "reco" ]; then
-	     cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r f; do
+	 	if [ "${fileFormat}" == "reco" ]; then
+	     	cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r f; do
                  grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo 999999 $f
-             done  &> ${sd_sub_dir}/a.runs.list.tmp
-	 elif [ "${fileFormat}" == "prompt" ]; then
-	     cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r rn f; do
-		 grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo $rn $f  
-	     done  &> ${sd_sub_dir}/a.runs.list.tmp 
-	 fi
+            done  &> ${sd_sub_dir}/a.runs.list.tmp
+	 	elif [ "${fileFormat}" == "prompt" ]; then
+	     	cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r rn f; do
+				 grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo $rn $f  
+	     	done  &> ${sd_sub_dir}/a.runs.list.tmp 
+	 	elif [ "${fileFormat}" == "mc" ]; then
+	     	cat ${sd_sub_dir}/a.list.dbs|grep .root | while read -r f; do
+                 grep $f  ${sd_sub_dir}/a.runs.list.tmp.phedex>& /dev/null && echo 1 $f
+	     	done  &> ${sd_sub_dir}/a.runs.list.tmp 
+     	fi 
      fi 
 else
     echo a.list.dbs is empty   
@@ -90,12 +96,12 @@ output = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).out
 error  = ./${sd_sub_dir}/output/1e.\$(Cluster).\$(Process).err
 notification=Never
 #x509userproxy=$ENV(X509_USER_PROXY)	
-x509userproxy=/tmp/x509up_u31057
+x509userproxy=/tmp/x509up_u31080
 queue
 	
 @EOF
 	
-condor_submit expressTools_UCSD_${sd_sub_dir}.cmd 
+#condor_submit expressTools_UCSD_${sd_sub_dir}.cmd 
     done >& $PWD/${sd_sub_dir}/submitting_log/${subLog}
     curT=`date +%s`
    

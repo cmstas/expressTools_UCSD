@@ -20,17 +20,21 @@ ls ${dc} | grep  ".root" |grep -v ".log" |while read -r f; do
 grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 
 # copy current list (made by submitter)
-cp ${submitDir}/a.runs.list.tmp runs.all.express
+'cp' ${submitDir}/a.runs.list.tmp runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
     if [ "${fileFormat}" == "reco" ]; then
-	 f=`echo $fr | cut -d"_" -f8 `
-	 run=`grep  $f runs.all.express | awk '{print $1}'`
-	 (( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
+	 	f=`echo $fr | cut -d"_" -f8 `
+	 	run=`grep  $f runs.all.express | awk '{print $1}'`
+	 	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     elif [ "${fileFormat}" == "prompt" ]; then
-	f=`echo $fr | cut -d"_" -f10 ` 
-	run=`grep  $f runs.all.express | awk '{print $1}'`
-	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
+		f=`echo $fr | cut -d"_" -f10 ` 
+		run=`grep  $f runs.all.express | awk '{print $1}'`
+		(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
+    elif [ "${fileFormat}" == "mc" ]; then
+	 	f=`echo $fr | cut -d"_" -f16 `
+		run=`grep  $f runs.all.express | awk '{print $1}'`
+	 	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
     else
 	echo failed to define fileFormat && exit 133
     fi 
@@ -70,7 +74,7 @@ ls newC/ | grep C$ | while read -r c; do
 	exit 36
     fi
     echo "WARNING : ${nC} is still in the merge queue : check it. File probably missing"
-#    cp ${nC} ${oC}
+#    'cp' ${nC} ${oC}
 #    chmod a-w ${oC}
 done
 mrgDest=$3
@@ -120,7 +124,7 @@ ls -d [1-9]* | while read -r rn; do
 			    echo "File mismatch at last point in ${scriptC}: ${refCount} != ${nRef} "
 			    exit 40
 			fi
-#			cp oldC/${scriptC} newC/${scriptC}
+#			'cp' oldC/${scriptC} newC/${scriptC}
 			refCount=0
 		    fi
 		    continue
@@ -133,7 +137,7 @@ ls -d [1-9]* | while read -r rn; do
 			echo "File mismatch at ${scriptC}  roll: ${refCount} != ${nRef}"
 			exit 40
 		    fi
-#		    cp oldC/${scriptC} newC/${scriptC}
+#		    'cp' oldC/${scriptC} newC/${scriptC}
 		    if (( haveNext==1 )) ; then
 			(( curCount=0 )) 
 			refCount=1
@@ -151,7 +155,7 @@ ls -d [1-9]* | while read -r rn; do
 	    fi
 	    echo "New/updated end merge ${scriptC} " 
 	
-	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite_5.27.06b-cms10.so\");\n" >> ${s}
+	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite.so\");\n" >> ${s}
 	    echo -e "\n\tTTree::SetMaxTreeSize(99000000000);" >> ${s}
 	    echo -e "\n\te = new TChain(\"Events\");\n "  >> ${s}
 	fi
@@ -168,8 +172,8 @@ ls -d [1-9]* | while read -r rn; do
 		isSame=`diff ${s} oldC/${scriptC} | grep -c ".root"`
 		if [ "${isSame}" != "0" ] ; then 
 		    echo "Override old ${scriptC} not possible" 
-		    rm ${s} 
-#		    cp oldC/${scriptC}  newC/${scriptC}
+		    'rm' ${s} 
+#		    'cp' oldC/${scriptC}  newC/${scriptC}
 		    exit 37
 		fi
 		[ "${isSame}" == "0" ]  &&  mv -f ${s} newC/${scriptC}
@@ -184,7 +188,7 @@ done
 
 #echo Testing only && exit 30
 
-rm -f merge.list
+'rm' -f merge.list
 touch merge.list
 ls newC/*.C | while read -r  nC ;  do 
     oC=`echo ${nC} | sed -e "s?newC/?oldC/?g"` 
@@ -208,7 +212,7 @@ cat merge.list | grep C$ | while read -r f ;  do
     fDest=`grep Merge ${nC} | tr '\"' '\n' | grep _ready`
     if [ "x${fDest}" == "x" ] ; then
 	echo "Corrupt ${nC}"
-	rm ${fDest}
+	'rm' ${fDest}
 	exit 38
 
     fi
