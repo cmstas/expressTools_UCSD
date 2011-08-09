@@ -24,7 +24,10 @@ void makeSkim(const char* nmI, const char* nmO, const char* expr=""){
     if (expr=="SingleMu"){
       gROOT->LoadMacro("ntupleFilterDilepPt2010.cc++");
       ntupleFilterTagAndProbe(nmI, nmO);
-
+    }
+    if (expr=="TriLepton"){
+      gROOT->LoadMacro("ntupleFilterTrilepPt201010.cc++");
+      ntupleFilterTrilepPt201010(nmI, nmO);
     }
   }
   //  
