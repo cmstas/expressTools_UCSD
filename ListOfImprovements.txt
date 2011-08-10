@@ -1,0 +1,31 @@
+Changes to Function:
+1) Remove merging step. Just skim. This will mean that there will be more and smaller files on hadoop (pre-skim).
+2) Change scripts to do skimming on the cluster and use xrdcp to copy the files off of it.
+3) Add sweeproot.C to our script to validate ntuples as they come out.
+4) Check for available disk space. Move and skim and ntuple smartly. Before it will try to skim and merge onto full disks. Must test for this and include error handling.
+5) Add a configuration file with user set variables and the necessary script to read it and set variables so the users don't have to edit code to run it. Ian has already written this (not the python one, but a new bash one that can seemlessly be implemented in the bash code). It needs to be added into the scripts.
+6) Store .out/.err log files on /data/tmp so that they don't wast home space and so Terrence doesn't need to back them up.
+7) Change output path for the files. The CMSSW release and CMS2 tag appears in the path too many times.
+
+Changes for Clarity and Ease of Use:
+1) COMMENT THE SCRIPTS
+2) Move all variables that need to be set by the user to run to the front of the script so they are easy to find.
+3) In the resubmit script don't use a python script to modify the command file, hard code into the bash script a way to do this.
+4) Replace the libMiniFWLite.so with a variable that can be set by the user. Check if it exists, don't skim or merge if it doesn't. Throw a warning to the user.
+5) Check if the specified configuration file Data*_cfg.py exists. Don't ntuple if it isn't in the folder. Throw a warning to the user.
+6) In checkAndSubmit.sh put the section that produces the .cmd file in it's own section. Ask Ian, he has this mostly writtend.
+7) In checkFailedJobs.sh, we don't need to check for each skim individually, we can put this in a loop and have a list of skims to check. Make this more general.
+8) Can probably do something like what is being done in 10 for checkAndRunSkim.sh
+9) There are some changes to make to checkAndMerge.sh, but since we're eliminating this, we shouldn't have to do it.
+
+
+Wish List:
+1) Add some lines to check for a valid user proxy. Ian has figured out why the environment variable isn't always set and how to check if it is set, and if not try to find where the proxy is stored. If the script can't find anything, it should warn the user that the users jobs may remain idle if submitted without a valid proxy.
+2) A script to create a new version of libMiniFWLite based on a CMSSW release and tag number.
+3) Modify compareGoodRun2Data.py to take a run range to do the comparison within. We can add missing lumi sections and run numbers to the monitoring page (I know this isn't entirely accurate, but is still a nice cross check to have).
+4) Add option to use xrootd or use a local accessor.
+5) Expand ntupling to use more sites than just ucsd (not entirely sure what is involved in this, but i think will be complex). Use only reliable sites.
+6) Add a progress log to monitoring website (will list number of files ntupled, number of files running, number of files, skimmed, number of files checked by sweeproot.C). Ben will bother us less if we do this.
+7) Script to check log files for exceptions and report them on the monitoring site.
+8) Move all supporting scripts (like getLFNList.py, compareGoodRun2Data.py, ect) to a sub directory labeled "lib" or "scripts" or something.
+9) Add option to use glideinWMS or direct submission to cluster.
