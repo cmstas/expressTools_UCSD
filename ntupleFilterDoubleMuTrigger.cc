@@ -45,6 +45,7 @@ bool select (bool isData)
   std::vector<std::string> trigNames;
   trigNames.push_back("HLT_DoubleMu7_v*");
   trigNames.push_back("HLT_Mu13_Mu8_v*");
+  trigNames.push_back("HLT_Mu17_Mu8_v*");
   for(hltIter=hltBegin; hltIter!=hltEnd; hltIter++){
     
     TString name = (*hltIter);
