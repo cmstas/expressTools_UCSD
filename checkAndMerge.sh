@@ -1,43 +1,54 @@
-dc=$1
-submitDir=$2
 
-minRun=$4
-maxRun=$5
+. loadConfig.sh $1
+UnmergedDatasetDir=$2
+DatasetSubDir=$3
+MergingDir=$4
+MergedDatasetDir=$5
+DatasetDir=$6
 
-fileFormat=$6
-mrgDest_hadoop=$7
 
-TOOL_DIR=$PWD
+
+TOOL_DIR=$PWD  #will need to carry this over from the other scripts. change it later.
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 echo Start Merging
 echo $dateS
 
-cd $submitDir
+cd $DatasetSubDir
 # get list of files which were not linked to the grouped
 [ ! -f "grouped.list" ]  && touch grouped.list
 cat grouped.list |grep ".root" >files.grouped
-ls ${dc} | grep  ".root" |grep -v ".log" |while read -r f; do
+ls ${UnmergedDatasetDir} | grep  ".root" |grep -v ".log" |while read -r f; do
 grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 
 # copy current list (made by submitter)
-'cp' ${submitDir}/a.runs.list.tmp runs.all.express
+'cp' ${DatasetSubDir}/a.runs.list.tmp ${DatasetSubDir}/runs.all.express
 grep ^[1-9] runs.all.express | awk '{print $1}' | sort -g | uniq > runs.txt
 cat files.ls | while read -r fr; do
-    if [ "${fileFormat}" == "reco" ]; then
-	 	f=`echo $fr | cut -d"_" -f8 `
-	 	run=`grep  $f runs.all.express | awk '{print $1}'`
-	 	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
-    elif [ "${fileFormat}" == "prompt" ]; then
-		f=`echo $fr | cut -d"_" -f10 ` 
-		run=`grep  $f runs.all.express | awk '{print $1}'`
-		(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
-    elif [ "${fileFormat}" == "mc" ]; then
-	 	f=`echo $fr | cut -d"_" -f16 `
-		run=`grep  $f runs.all.express | awk '{print $1}'`
-	 	(( run >= minRun )) && (( run <= maxRun )) && echo $run $f `grep $fr files.ls`
-    else
-	echo failed to define fileFormat && exit 133
-    fi 
+	#examples
+	##store_data_Run2011A_Photon_AOD_May10ReReco-v1_0005_F44A69EC-207C-E011-850D-001A64789D1C_999999.root
+	##store_data_Run2011A_Photon_AOD_PromptReco-v4_000_167_913_1E4DDB3C-88A3-E011-86AB-BCAEC5329728.root
+	## expect to find something of the form blah_blah_number_number_number-stuf.root, will extract the "stuff" part
+    f=${fr%.root}  #remove root from the end
+	f=${f##*_} #remove all the words and numbers seperated by underscores from the filename
+	run=`grep  $f runs.all.express | awk '{print $1}'`
+	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
+
+
+    # if [ "${fileFormat}" == "reco" ]; then
+	#  	f=`echo $fr | cut -d"_" -f8 `
+	#  	run=`grep  $f runs.all.express | awk '{print $1}'`
+	#  	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
+    # elif [ "${fileFormat}" == "prompt" ]; then
+	# 	f=`echo $fr | cut -d"_" -f10 ` 
+	# 	run=`grep  $f runs.all.express | awk '{print $1}'`
+	# 	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
+    # elif [ "${fileFormat}" == "mc" ]; then
+	#  	f=`echo $fr | cut -d"_" -f16 `
+	# 	run=`grep  $f runs.all.express | awk '{print $1}'`
+	#  	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
+    # else
+	# echo failed to define fileFormat && exit 133
+    # fi 
    
 done > files.runs.ls
 grep -v ^[1-9]  files.runs.ls >& /dev/null && echo Corrupt  files.runs.ls && exit 33
@@ -45,24 +56,24 @@ grep -v ^[1-9]  files.runs.ls >& /dev/null && echo Corrupt  files.runs.ls && exi
 grep store files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
 #grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
     if [ ! -d "${rn}" ] ; then 
-	mkdir ${rn}
-	rnL=`echo ${rn} | cut -c1-3`
-	rnR=`echo ${rn} | cut -c4-6`
-	#ls -d ${dc}/${rnL} >& /dev/null || mkdir ${dc}/${rnL} 
-	#mkdir ${dc}/${rnL}/${rnR}
+		mkdir ${rn}
+		rnL=`echo ${rn} | cut -c1-3`  #I don't think this is needed anymore
+		rnR=`echo ${rn} | cut -c4-6`  #I don't think this is needed anymore
+	#ls -d ${UnmergedDatasetDir}/${rnL} >& /dev/null || mkdir ${UnmergedDatasetDir}/${rnL} 
+	#mkdir ${UnmergedDatasetDir}/${rnL}/${rnR}
     fi
 done
 grep store files.runs.ls | while read -r rn fo fr; do 
 #grep _cms files.runs.ls | while read -r rn fo fr; do 
     if [ ! -h "$rn/$fr" ] ; then
-	ln -s ${dc}/${fr} ${rn}/${fr}
-	sleep 1
-	rnL=`echo ${rn} | cut -c1-3`
-        rnR=`echo ${rn} | cut -c4-6`
-	fLog=`echo ${fr} | sed -e 's/.root/.log/g' `
-	#rfrename ${dc}/${fr} ${dc}/${rnL}/${rnR}/${fr}
-	#rfrename ${dc}/${fLog} ${dc}/${rnL}/${rnR}/${fLog}
-	echo ${fr}  >>  grouped.list
+		ln -s ${UnmergedDatasetDir}/${fr} ${rn}/${fr}
+		sleep 1
+		rnL=`echo ${rn} | cut -c1-3`       #I don't think this is needed anymore
+		rnR=`echo ${rn} | cut -c4-6`   #I don't think this is needed anymore
+		fLog=`echo ${fr} | sed -e 's/.root/.log/g' `
+	#rfrename ${UnmergedDatasetDir}/${fr} ${UnmergedDatasetDir}/${rnL}/${rnR}/${fr}
+	#rfrename ${UnmergedDatasetDir}/${fLog} ${UnmergedDatasetDir}/${rnL}/${rnR}/${fLog}
+		echo ${fr}  >>  grouped.list
     fi
 done
 
@@ -77,9 +88,9 @@ ls newC/ | grep C$ | while read -r c; do
 #    'cp' ${nC} ${oC}
 #    chmod a-w ${oC}
 done
-mrgDest=$3
+
 ls -d [1-9]* | while read -r rn; do
-    (( rn < minRun )) && (( rn > maxRun )) && continue
+    (( rn < MinRunNumber )) && (( rn > MaxRunNumber )) && continue
 #    echo Checking $rn
     count=0 
     sec=-1
@@ -155,8 +166,8 @@ ls -d [1-9]* | while read -r rn; do
 	    fi
 	    echo "New/updated end merge ${scriptC} " 
 	
-	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/libMiniFWLite.so\");\n" >> ${s}
-	    echo -e "\n\tTTree::SetMaxTreeSize(99000000000);" >> ${s}
+	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/${LibMiniFWLite}\");\n" >> ${s}
+	    echo -e "\n\tTTree::SetMaxTreeSize(8000000000);" >> ${s}   #set the max size of merged root files to 8 Gb
 	    echo -e "\n\te = new TChain(\"Events\");\n "  >> ${s}
 	fi
 	echo -e "\n\te->Add(\"${rn}/${f}\");">> ${s}
@@ -166,7 +177,7 @@ ls -d [1-9]* | while read -r rn; do
 	(( curCount == 50 || cTot == 0 ))  && closeC="YES"
 #  echo ${curCount} ${cTot} closeC ${closeC}
 	if [ "${closeC}" == "YES" ] ; then
-	    echo -e "\n\te->Merge(\"${mrgDest}/temp/merged_ntuple_${rn}_${sec}_ready.root\",\"fast\");\n}" >> ${s}
+	    echo -e "\n\te->Merge(\"${MergingDir}/${DatasetDir}/${CMS2Tag}/temp/merged_ntuple_${rn}_${sec}_ready.root\",\"fast\");\n}" >> ${s}
 	    [ ! -f "oldC/${scriptC}" ] && echo "New ${scriptC} " && mv -f ${s} newC/${scriptC}
 	    if [ -f "${s}" -a -f "oldC/${scriptC}" ] ; then
 		isSame=`diff ${s} oldC/${scriptC} | grep -c ".root"`
@@ -211,43 +222,42 @@ cat merge.list | grep C$ | while read -r f ;  do
     oC=`echo ${nC} | sed -e "s?newC/?oldC/?g"`
     fDest=`grep Merge ${nC} | tr '\"' '\n' | grep _ready`
     if [ "x${fDest}" == "x" ] ; then
-	echo "Corrupt ${nC}"
-	'rm' ${fDest}
-	exit 38
-
+		echo "Corrupt ${nC}"
+		'rm' ${fDest}
+		exit 38
     fi
     if [ -s "${fDest}" ] ; then
-	echo "all done with ${fDest} , copy $nC to $oC"
-	fDGood=`echo ${fDest} | sed -e 's/_ready//g;s?/temp/?/?g'`
-	mv ${fDest} ${fDGood}
-	mv ${nC} ${oC}
-	chmod a-w ${oC}
-	fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${mrgDest}?\${mrgDest_hadoop}?g;s?/hadoop??g"` 
-	echo ${fDGood}
-	echo ${mrgDest}
-	echo ${mrgDest_hadoop}
-	echo ${fDGood_hadoop}
-	hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
+		echo "all done with ${fDest} , copy $nC to $oC"
+		fDGood=`echo ${fDest} | sed -e 's/_ready//g;s?/temp/?/?g'`
+		mv ${fDest} ${fDGood}
+		mv ${nC} ${oC}
+		chmod a-w ${oC}
+		fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${MergingDir}/\${DatasetDir}/\${CMS2Tag}?\${MergedDatasetDir}?g;s?/hadoop??g"` 
+		echo ${fDGood}
+		echo ${MergingDir}
+		echo ${MergedDatasetDir}
+		echo ${fDGood_hadoop}
+		hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
 	
-	copyE="$?"
-	[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
+		copyE="$?"
+		[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
        
-	fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
-	fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
-	echo source file $fSize_in
-	echo destination file $fSize_out
-	if [ "$fSize_in" -ne  "$fSize_out" ]; then
-	    'rm' /hadoop${fDGood_hadoop}
-	    hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
-	elif [ "$fSize_in" ==  "$fSize_out" ]; then 
-	    'rm' ${fDGood}
-	else
-	    echo Error while copying from /data/tmp to hadoop && exit 59 
-	fi
+		fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
+		fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
+		echo source file $fSize_in
+		echo destination file $fSize_out
+		if [ "$fSize_in" -ne  "$fSize_out" ]; then
+			'rm' /hadoop${fDGood_hadoop}
+			hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
+		elif [ "$fSize_in" ==  "$fSize_out" ]; then 
+			'rm' ${fDGood}
+		else
+			echo Error while copying from /data/tmp to hadoop && exit 59 
+		fi
     fi
 done >& merging_log/merging.log.`date '+\%Y.\%m.\%d-\%H.\%M.\%S'`
 #now move done files to merged
-find ${mrgDest}/ -name merged_ntuple\*_ready.root | while read -r f ; do
+find ${MergingDir}/ -name merged_ntuple\*_ready.root | while read -r f ; do
     echo ${f}
     fo=`echo $f | sed -e 's/_ready//g;s?/temp/?/failed?g'`
     mv ${f} ${fo}

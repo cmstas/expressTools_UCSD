@@ -15,7 +15,9 @@ fileIn=$3
 
 outputDir=$4
 
-fileFormat=$8
+#input_data_Run=$7
+
+#fileFormat=$8
 
 #export DATASET_NAME=$5
 #export CMS2_TAG=$6
@@ -39,25 +41,28 @@ relBase=`echo $CMSSW_BASE | sed -e 's?\([^$]*\)/\([^$]*$\)?\2?g'`
 
 oDir=${oDirBase}/${relBase}
 
+#### WARNING: must change these lines if ever want to do the ntupling at sites other than ucsd ####
 [ -d "${oDir}" ] && echo WARNING "destination ${oDir} already exists -- will overwrite"
 export failMkDestDir=""
 [ ! -d "${oDir}" ] && echo Create ${oDir} && mkdir ${oDir}
 [ ! -d "${oDir}" ] &&  export failMkDestDir=yes
 [ "x${failMkDestDir}" == "xyes" ] && echo failed to make destination dir && exit 46
-[ ! -d "${oDir}/log" ] && echo Create ${oDir}/log && mkdir ${oDir}/log
+[ ! -d "${oDir}/log" ] && echo Create ${oDir}/log && mkdir ${oDir}/log 
 [ ! -d "${oDir}/xml" ] && echo Create ${oDir}/xml && mkdir ${oDir}/xml
 
-input_data_Run=$7
+
 #files start with root://xrootd.unl.edu//store... using the xrootd system
-if [ "${fileFormat}" == "prompt"  ]; then
-    fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
-elif [ "${fileFormat}" == "reco"  ]; then
-    fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
-elif [ "${fileFormat}" == "mc"  ]; then
-    fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
-else 
-    echo failed to define fileFormat && exit 122 
-fi
+# if [ "${fileFormat}" == "prompt"  ]; then
+#     fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
+# elif [ "${fileFormat}" == "reco"  ]; then
+#     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
+# elif [ "${fileFormat}" == "mc"  ]; then
+#     fileOut=`echo ${fileIn} | sed -e "s?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g;s?.root?_${input_data_Run}.root?g"` ##replace / or : by _; and remove root___xrootd.unl.edu__
+# else 
+#     echo failed to define fileFormat && exit 122 
+# fi
+
+fileOut=`echo ${fileIn} | sed -e 's?/?_?g;s?:?_?g;s/root___xrootd.unl.edu__//g'` ##replace / or : by _; and remove file__
 
 echo Will cmsRun -e ${fileCfg} with ${nEvents} input: ${fileIn} to ${fileOut}
 export INPUT_FILE=${fileIn}

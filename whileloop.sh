@@ -1,57 +1,118 @@
-#!/bin/bash 
-cmssw_release=$1
-cms2_tag=$2
-dataset_name_1=$3
-fileFormat=$4
+#!/bin/bash
 
-tmp_merged_dir=`echo /data/tmp/yanjuntu `
-cmssw_dir=`echo /code/osgcode/yanjuntu/${cmssw_release}_${cms2_tag}/src`
+. loadConfig.sh $1
 
-minRunNumber=`echo 0 `
-maxRunNumber=`echo 999999 `
-config_file=`echo Data398ReReco_SDFilter_cfg.py`
-hadoop_dir=`echo /hadoop/cms/store/user/yanjuntu/${cmssw_release}_${cms2_tag}`
-express_tool_dir=` echo $PWD `
-out_dir=`echo /nfs-4/userdata/cms2`
-[ ! -d "${hadoop_dir}" ] && echo Create ${hadoop_dir} && mkdir ${hadoop_dir}
+for Dataset in $Datasets; do
 
-#dataset_dir_1=`echo $dataset_name_1 |sed -e 's/\/MinimumBias/MinimumBias/g;s?/?_?g' `
-dataset_dir_1_tmp=`echo $dataset_name_1 |sed -e 's?/?_?g' `
-dataset_dir_1=`echo ${dataset_dir_1_tmp:1} ` 
-dataset_hadoop_dir_1=`echo ${hadoop_dir}/${dataset_dir_1} `
+	MergingDir="/data/tmp/$USER"                                                     #location of the directory used for merging and logging
+	HadoopDir="/hadoop/cms/store/user/${HadoopUserDir}/${CMSSWRelease}_${CMS2Tag}"   #long term storage of ntupled datasets
+	CMSSWDir="${OSGCode}/${CMSSWRelease}_${CMS2Tag}/src"                             #location of compiled release on gw2  
+	StartDir="$PWD"
+	DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+	DatasetDir="${DatasetDir_tmp:1}"                                                     #dataset name with "/" replaced with "_", used as the dir name for the dataset ntuples
+	DatasetHadoopDir="${HadoopDir}/${DatasetDir}"                                        #full path to the hadoop dir where the dataset is stored
+	DatasetSubDir=${StartDir}/${DatasetDir}                                              #location where the accounting is done to keep track of which files have been ntupled, merged, etc
+	UnmergedDatasetDir="${DatasetHadoopDir}/${CMSSWRelease}_${CMS2Tag}"                  #location of unmerged ntuples on hadoop
+	MergedDatasetDir="${DatasetHadoopDir}/${CMSSWRelease}_${CMS2Tag}_merged/${CMS2Tag}"  #location of the merged nutples on hadoop
+	#MergingDir="${MergingDir}/${DatasetDir}/${CMS2Tag}"                                  #temporary disk for merging ntuples
 
-express_tool_subdir_1=${express_tool_dir}/${dataset_dir_1}
-[ ! -d "${express_tool_subdir_1}" ] && echo Create ${express_tool_subdir_1} && mkdir ${express_tool_subdir_1}
-[ ! -f "${express_tool_subdir_1}/a.list" ]  && echo Create ${express_tool_subdir_1}/a.list && touch ${express_tool_subdir_1}/a.list
-[ ! -d "${express_tool_subdir_1}/newC" ] && echo Create ${express_tool_subdir_1}/newC && mkdir ${express_tool_subdir_1}/newC
-[ ! -d "${express_tool_subdir_1}/oldC" ] && echo Create ${express_tool_subdir_1}/oldC && mkdir ${express_tool_subdir_1}/oldC
-[ ! -d "${express_tool_subdir_1}/output" ] && echo Create ${express_tool_subdir_1}/output && mkdir ${express_tool_subdir_1}/output
-[ ! -d "${express_tool_subdir_1}/submitting_log" ] && echo Create ${express_tool_subdir_1}/submitting_log && mkdir ${express_tool_subdir_1}/submitting_log
-[ ! -d "${express_tool_subdir_1}/merging_log" ] && echo Create ${express_tool_subdir_1}/merging_log && mkdir ${express_tool_subdir_1}/merging_log
-[ ! -d "${dataset_hadoop_dir_1}" ] && echo Create ${dataset_hadoop_dir_1} && mkdir ${dataset_hadoop_dir_1}
-unmerged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag} `
-#merged_file_dir_1=`echo $out_dir/${dataset_dir_1}/${cms2_tag} `
-merged_file_dir_1=`echo ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag} `
-tmp_merged_dir_1=`echo ${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}`
-[ ! -d "$out_dir/${dataset_dir_1}" ] && echo Create  $out_dir/${dataset_dir_1} && mkdir $out_dir/${dataset_dir_1}
-[ ! -d "$out_dir/${dataset_dir_1}/${cms2_tag}" ] && echo Create $out_dir/${dataset_dir_1}/${cms2_tag} && mkdir $out_dir/${dataset_dir_1}/${cms2_tag}
-[ ! -d "$out_dir/${dataset_dir_1}/${cms2_tag}/temp" ] && echo Create $out_dir/${dataset_dir_1}/${cms2_tag}/temp && mkdir $out_dir/${dataset_dir_1}/${cms2_tag}/temp
-[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged
-[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag} && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}
-[ ! -d "${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp" ] && echo Create ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp && mkdir ${dataset_hadoop_dir_1}/${cmssw_release}_${cms2_tag}_merged/${cms2_tag}/temp
+	#set up accounting directories
+	[ ! -d "${DatasetSubDir}" ] && echo Create ${DatasetSubDir} && mkdir ${DatasetSubDir}
+	[ ! -f "${DatasetSubDir}/a.list" ]  && echo Create ${DatasetSubDir}/a.list && touch ${DatasetSubDir}/a.list
+	[ ! -d "${DatasetSubDir}/newC" ] && echo Create ${DatasetSubDir}/newC && mkdir ${DatasetSubDir}/newC
+	[ ! -d "${DatasetSubDir}/oldC" ] && echo Create ${DatasetSubDir}/oldC && mkdir ${DatasetSubDir}/oldC
+	[ ! -d "${DatasetSubDir}/output" ] && echo Create ${DatasetSubDir}/output && mkdir ${DatasetSubDir}/output
+	[ ! -d "${DatasetSubDir}/submitting_log" ] && echo Create ${DatasetSubDir}/submitting_log && mkdir ${DatasetSubDir}/submitting_log
+	[ ! -d "${DatasetSubDir}/merging_log" ] && echo Create ${DatasetSubDir}/merging_log && mkdir ${DatasetSubDir}/merging_log
+	
+	#set up hadoop directories
+	[ ! -d "${HadoopDir}" ] && echo Create ${HadoopDir} && mkdir ${HadoopDir}
+	[ ! -d "${DatasetHadoopDir}" ] && echo Create ${DatasetHadoopDir} && mkdir ${DatasetHadoopDir}
+	[ ! -d "${UnmergedDatasetDir}" ] && echo Create ${UnmergedDatasetDir} && mkdir ${UnmergedDatasetDir}
+	[ ! -d "${MergedDatasetDir}" ] && echo Create ${MergedDatasetDir} && mkdir ${MergedDatasetDir}
+	#[ ! -d "${MergedDatasetDir}/${CMS2Tag}" ] && echo Create ${MergedDatasetDir}/${CMS2Tag} && mkdir ${MergedDatasetDir}/${CMS2Tag}
+	#[ ! -d "${MergedDatasetDir}/${CMS2Tag}/temp" ] && echo Create ${MergedDatasetDir}/${CMS2Tag}/temp && mkdir ${MergedDatasetDir}/${CMS2Tag}/temp
+	[ ! -d "${MergedDatasetDir}/temp" ] && echo Create ${MergedDatasetDir}/temp && mkdir ${MergedDatasetDir}/temp
 
-[ ! -d "${tmp_merged_dir}/${dataset_dir_1}" ] && echo Create  $${tmp_merged_dir}/${dataset_dir_1} && mkdir ${tmp_merged_dir}/${dataset_dir_1}
-[ ! -d "${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}" ] && echo Create  $${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag} && mkdir ${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}
-[ ! -d "${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}/temp" ] && echo Create  $${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}/temp && mkdir ${tmp_merged_dir}/${dataset_dir_1}/${cms2_tag}/temp
+    #set up nfs directories
+	[ ! -d "$NFSDir/${DatasetDir}" ] && echo Create  $NFSDir/${DatasetDir} && mkdir $NFSDir/${DatasetDir}
+	[ ! -d "$NFSDir/${DatasetDir}/${CMS2Tag}" ] && echo Create $NFSDir/${DatasetDir}/${CMS2Tag} && mkdir $NFSDir/${DatasetDir}/${CMS2Tag}
+	[ ! -d "$NFSDir/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create $NFSDir/${DatasetDir}/${CMS2Tag}/temp && mkdir $NFSDir/${DatasetDir}/${CMS2Tag}/temp
+	
+	#set up temp mergind directories
+	[ ! -d "${MergingDir}" ] && echo Create  ${MergingDir} && mkdir ${MergingDir}
+	[ ! -d "${MergingDir}/${DatasetDir}" ] && echo Create  ${MergingDir}/${DatasetDir} && mkdir ${MergingDir}/${DatasetDir}
+	[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag} && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}
+	[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp
+	[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/failed" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed
+	
+#	while [ 1 ]; do
+		echo $MergingDir
+		source checkAndSubmit.sh $1 $CMSSWDir $Dataset $DatasetSubDir $DatasetHadoopDir
+#		sleep 5400
 
-#while [ 1 ]
- # do
-echo ${tmp_merged_dir_1}
-  #source checkAndSubmit.sh $cmssw_dir $dataset_name_1 $dataset_dir_1 $minRunNumber $dataset_hadoop_dir_1 $config_file $cms2_tag $maxRunNumber $fileFormat
- # sleep 5400
+		source checkAndMerge.sh $1 $UnmergedDatasetDir $DatasetSubDir $MergingDir $MergedDatasetDir $DatasetDir
+#		sleep 5400
+#	done
 
- # source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  $merged_file_dir_1 ${minRunNumber} $maxRunNumber $fileFormat
-source checkAndMerge.sh $unmerged_file_dir_1 $express_tool_subdir_1  ${tmp_merged_dir_1} ${minRunNumber} $maxRunNumber $fileFormat ${merged_file_dir_1}
- # sleep 5400
-#done
+done
+
+ 
+# CMSSWRelease=$1
+# CMS2Tag=$2
+# Dataset=$3
+# fileFormat=$4
+
+# #### USER SET VARIABLES ####
+# MergingDir="/data/tmp/imacneill"
+# MinRunNumber=0
+# MaxRunNumber=999999
+# NtupleConfig="Data412ReReco_SDFilter_cfg.py"
+# HadoopDir="/hadoop/cms/store/user/macneill/${CMSSWRelease}_${CMS2Tag}"
+# CMSSWDir="/code/osgcode/imacneill/${CMSSWRelease}_${CMS2Tag}/src"
+# NFSDir="/nfs-4/userdata/imacneill"
+
+
+# StartDir="$PWD"
+# [ ! -d "${HadoopDir}" ] && echo Create ${HadoopDir} && mkdir ${HadoopDir}
+
+# #DatasetDir=`echo $Dataset |sed -e 's/\/MinimumBias/MinimumBias/g;s?/?_?g' `
+# DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+# DatasetDir="${DatasetDir_tmp:1}"
+# DatasetHadoopDir="${HadoopDir}/${DatasetDir}"
+
+# DatasetSubDir=${StartDir}/${DatasetDir}
+# [ ! -d "${DatasetSubDir}" ] && echo Create ${DatasetSubDir} && mkdir ${DatasetSubDir}
+# [ ! -f "${DatasetSubDir}/a.list" ]  && echo Create ${DatasetSubDir}/a.list && touch ${DatasetSubDir}/a.list
+# [ ! -d "${DatasetSubDir}/newC" ] && echo Create ${DatasetSubDir}/newC && mkdir ${DatasetSubDir}/newC
+# [ ! -d "${DatasetSubDir}/oldC" ] && echo Create ${DatasetSubDir}/oldC && mkdir ${DatasetSubDir}/oldC
+# [ ! -d "${DatasetSubDir}/output" ] && echo Create ${DatasetSubDir}/output && mkdir ${DatasetSubDir}/output
+# [ ! -d "${DatasetSubDir}/submitting_log" ] && echo Create ${DatasetSubDir}/submitting_log && mkdir ${DatasetSubDir}/submitting_log
+# [ ! -d "${DatasetSubDir}/merging_log" ] && echo Create ${DatasetSubDir}/merging_log && mkdir ${DatasetSubDir}/merging_log
+# [ ! -d "${DatasetHadoopDir}" ] && echo Create ${DatasetHadoopDir} && mkdir ${DatasetHadoopDir}
+# UnmergedDatasetDir="${DatasetHadoopDir}/${CMSSWRelease}_${CMS2Tag}"
+# #MergedDatasetDir=`echo $NFSDir/${DatasetDir}/${CMS2Tag} `
+# MergedDatasetDir="${MergedDatasetDir}/${CMS2Tag}"
+# MergingDir="${MergingDir}/${DatasetDir}/${CMS2Tag}"
+# [ ! -d "$NFSDir/${DatasetDir}" ] && echo Create  $NFSDir/${DatasetDir} && mkdir $NFSDir/${DatasetDir}
+# [ ! -d "$NFSDir/${DatasetDir}/${CMS2Tag}" ] && echo Create $NFSDir/${DatasetDir}/${CMS2Tag} && mkdir $NFSDir/${DatasetDir}/${CMS2Tag}
+# [ ! -d "$NFSDir/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create $NFSDir/${DatasetDir}/${CMS2Tag}/temp && mkdir $NFSDir/${DatasetDir}/${CMS2Tag}/temp
+# [ ! -d "${MergedDatasetDir}" ] && echo Create ${MergedDatasetDir} && mkdir ${MergedDatasetDir}
+# [ ! -d "${MergedDatasetDir}/${CMS2Tag}" ] && echo Create ${MergedDatasetDir}/${CMS2Tag} && mkdir ${MergedDatasetDir}/${CMS2Tag}
+# [ ! -d "${MergedDatasetDir}/${CMS2Tag}/temp" ] && echo Create ${MergedDatasetDir}/${CMS2Tag}/temp && mkdir ${MergedDatasetDir}/${CMS2Tag}/temp
+
+# [ ! -d "${MergingDir}/${DatasetDir}" ] && echo Create  ${MergingDir}/${DatasetDir} && mkdir ${MergingDir}/${DatasetDir}
+# [ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag} && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}
+# [ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp
+
+# #while [ 1 ]
+#  # do
+# echo ${MergingDir}
+#   #source checkAndSubmit.sh $CMSSWDir $Dataset $DatasetDir $MinRunNumber $DatasetHadoopDir $NtupleConfig $CMS2Tag $MaxRunNumber $fileFormat
+#  # sleep 5400
+
+
+# source checkAndMerge.sh $UnmergedDatasetDir $DatasetSubDir  ${MergingDir} ${MinRunNumber} $MaxRunNumber $fileFormat ${MergedDatasetDir}
+#  # sleep 5400
+# #done
 

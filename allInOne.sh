@@ -2,24 +2,31 @@
 export VDT_LOCATION=/data/vdt
 export EDG_WL_LOCATION=$VDT_LOCATION/edg
 source /data/vdt/setup.sh 
-fileFormat="`echo prompt` "
 
 
+ConfigFiles=$@
+echo $ConfigFiles
 
+for Config in $ConfigFiles; do
+	source whileloop.sh $Config &
+	echo "whileloop.sh PID=$! for config $Config."
 
-cmssw_release=CMSSW_4_1_2_patch1
-cms2_tag=V04-00-05
-
-
-#dataset_names="`echo /Electron/Run2010B-Nov4ReReco_v1/RECO` `echo /Mu/Run2010A-Nov4ReReco_v1/RECO`"
-dataset_names="`echo /DoubleElectron/Run2011A-PromptReco-v1/AOD` `echo /DoubleMu/Run2011A-PromptReco-v1/AOD` `echo /MuEG/Run2011A-PromptReco-v1/AOD`"
-
-
-
-
-for dataset_name in $dataset_names; do
-    source whileloop.sh $cmssw_release $cms2_tag $dataset_name $fileFormat $who &
 done
+
+
+
+
+
+# #### USER SET VARIABLES ####
+# cmssw_release=CMSSW_4_2_4
+# cms2_tag=V04-02-22
+# dataset_names="/Photon/Run2011A-PromptReco-v4/AOD /MuEG/Run2011A-May10ReReco-v1/AOD /TTWTo2Lminus2Nu_7TeV-madgraph/Summer11-PU_S4_START42_V11-v1/AODSIM"
+
+
+# for dataset_name in $dataset_names; do
+#     source whileloop.sh $cmssw_release $cms2_tag $dataset_name $fileFormat &
+# 	echo "whileloop.sh PID=$! for Dataset $dataset_name"
+# done
 
 
 
