@@ -6,9 +6,14 @@ Changes to Function:
 DONE 5) Add a configuration file with user set variables and the necessary script to read it and set variables so the users don't have to edit code to run it. Ian has already written this (not the python one, but a new bash one that can seemlessly be implemented in the bash code). It needs to be added into the scripts.
 6) Store .out/.err log files on /data/tmp so that they don't wast home space and so Terrence doesn't need to back them up.
 7) Change output path for the files. The CMSSW release and CMS2 tag appears in the path too many times.
+  something like /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/unmerged/
+                 /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/merged/
+
 8) Move the lines that create nfs dirs to allskim, move the lines that create merged dirs to checkAndMerge
-9) use libminifwlite, or if can't find use fwlite from CMSSW environ if set, or if neither throw an error
-DONE 10) Change the max size of merged files to something managable, choose 8 Gb for now since I think the grid has a 10 Gb size limit for jobs. May want to revisit this.
+DONE 9) in skimming use libminifwlite, or if can't find use fwlite from CMSSW environ if set, or if neither throw an error
+10) in merging use libminifwlite, or if can't find use fwlite from CMSSW environ if set, or if neither throw an error
+DONE 11) Change the max size of merged files to something managable, choose 8 Gb for now since I think the grid has a 10 Gb size limit for jobs. May want to revisit this.
+12) make a seperate .C file to do mergin, call it from shell script instead of printing it out???
 
 Changes for Clarity and Ease of Use:
 1) COMMENT THE SCRIPTS

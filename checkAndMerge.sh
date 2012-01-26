@@ -32,47 +32,24 @@ cat files.ls | while read -r fr; do
 	f=${f##*_} #remove all the words and numbers seperated by underscores from the filename
 	run=`grep  $f runs.all.express | awk '{print $1}'`
 	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
-
-
-    # if [ "${fileFormat}" == "reco" ]; then
-	#  	f=`echo $fr | cut -d"_" -f8 `
-	#  	run=`grep  $f runs.all.express | awk '{print $1}'`
-	#  	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
-    # elif [ "${fileFormat}" == "prompt" ]; then
-	# 	f=`echo $fr | cut -d"_" -f10 ` 
-	# 	run=`grep  $f runs.all.express | awk '{print $1}'`
-	# 	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
-    # elif [ "${fileFormat}" == "mc" ]; then
-	#  	f=`echo $fr | cut -d"_" -f16 `
-	# 	run=`grep  $f runs.all.express | awk '{print $1}'`
-	#  	(( run >= MinRunNumber )) && (( run <= MaxRunNumber )) && echo $run $f `grep $fr files.ls`
-    # else
-	# echo failed to define fileFormat && exit 133
-    # fi 
    
 done > files.runs.ls
 grep -v ^[1-9]  files.runs.ls >& /dev/null && echo Corrupt  files.runs.ls && exit 33
 
 grep store files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
-#grep _cms files.runs.ls | cut -d" " -f1 | sort | uniq | while read -r rn; do 
     if [ ! -d "${rn}" ] ; then 
 		mkdir ${rn}
 		rnL=`echo ${rn} | cut -c1-3`  #I don't think this is needed anymore
 		rnR=`echo ${rn} | cut -c4-6`  #I don't think this is needed anymore
-	#ls -d ${UnmergedDatasetDir}/${rnL} >& /dev/null || mkdir ${UnmergedDatasetDir}/${rnL} 
-	#mkdir ${UnmergedDatasetDir}/${rnL}/${rnR}
     fi
 done
 grep store files.runs.ls | while read -r rn fo fr; do 
-#grep _cms files.runs.ls | while read -r rn fo fr; do 
     if [ ! -h "$rn/$fr" ] ; then
 		ln -s ${UnmergedDatasetDir}/${fr} ${rn}/${fr}
 		sleep 1
 		rnL=`echo ${rn} | cut -c1-3`       #I don't think this is needed anymore
 		rnR=`echo ${rn} | cut -c4-6`   #I don't think this is needed anymore
 		fLog=`echo ${fr} | sed -e 's/.root/.log/g' `
-	#rfrename ${UnmergedDatasetDir}/${fr} ${UnmergedDatasetDir}/${rnL}/${rnR}/${fr}
-	#rfrename ${UnmergedDatasetDir}/${fLog} ${UnmergedDatasetDir}/${rnL}/${rnR}/${fLog}
 		echo ${fr}  >>  grouped.list
     fi
 done
@@ -85,13 +62,10 @@ ls newC/ | grep C$ | while read -r c; do
 	exit 36
     fi
     echo "WARNING : ${nC} is still in the merge queue : check it. File probably missing"
-#    'cp' ${nC} ${oC}
-#    chmod a-w ${oC}
 done
 
 ls -d [1-9]* | while read -r rn; do
     (( rn < MinRunNumber )) && (( rn > MaxRunNumber )) && continue
-#    echo Checking $rn
     count=0 
     sec=-1
     cTot=`ls ${rn} | grep -c root`
@@ -106,7 +80,6 @@ ls -d [1-9]* | while read -r rn; do
 	if [ "${startNew}" == "YES" ] ; then
 	    (( sec++ ))
 	    scriptC=comb${rn}_${sec}.C; s=${scriptC}_temp
-#	    echo "Starting new ${scriptC}"
       # 
 	    if [ -f "${s}" ] ; then
 		echo "Old ${s} not closed. Something is wrong" 
@@ -122,33 +95,27 @@ ls -d [1-9]* | while read -r rn; do
 	    if [ -f "oldC/${scriptC}" ] ; then
 		fileFound=`grep -c ${f} oldC/${scriptC}`
 		if (( fileFound == 1 ))  ; then
-#			echo "Skip ${f} now ${sec}"
 		    (( curCount=0 ))
 		    (( refCount++ ))
-#		    echo "${scriptC} refCount is ${refCount}"
 		    (( sec-- )) 
 		    if (( cTot == 0 )) ; then
 			# this is the last time we are in this loop
-			#nRef=`grep -c ".root" oldC/${scriptC}`
 			nRef=`grep -v "e->Merge" oldC/${scriptC} | grep -c ".root" `
 			if (( refCount != nRef )) ; then
 			    echo "File mismatch at last point in ${scriptC}: ${refCount} != ${nRef} "
 			    exit 40
 			fi
-#			'cp' oldC/${scriptC} newC/${scriptC}
 			refCount=0
 		    fi
 		    continue
 		else
 		    (( haveNext=0 ))
 		    [ -f "oldC/${scriptNext}" ] && haveNext=`grep -c ${f} oldC/${scriptNext}`
-		    #nRef=`grep -c ".root" oldC/${scriptC}`
 		    nRef=`grep -v "e->Merge" oldC/${scriptC} | grep -c ".root" `
 		    if (( refCount != nRef )) ; then 
 			echo "File mismatch at ${scriptC}  roll: ${refCount} != ${nRef}"
 			exit 40
 		    fi
-#		    'cp' oldC/${scriptC} newC/${scriptC}
 		    if (( haveNext==1 )) ; then
 			(( curCount=0 )) 
 			refCount=1
@@ -173,9 +140,7 @@ ls -d [1-9]* | while read -r rn; do
 	echo -e "\n\te->Add(\"${rn}/${f}\");">> ${s}
 	(( curCount++ ))
 	closeC="NO"
-	#(( curCount == 100 || cTot == 0 ))  && closeC="YES"
 	(( curCount == 50 || cTot == 0 ))  && closeC="YES"
-#  echo ${curCount} ${cTot} closeC ${closeC}
 	if [ "${closeC}" == "YES" ] ; then
 	    echo -e "\n\te->Merge(\"${MergingDir}/${DatasetDir}/${CMS2Tag}/temp/merged_ntuple_${rn}_${sec}_ready.root\",\"fast\");\n}" >> ${s}
 	    [ ! -f "oldC/${scriptC}" ] && echo "New ${scriptC} " && mv -f ${s} newC/${scriptC}
@@ -184,7 +149,6 @@ ls -d [1-9]* | while read -r rn; do
 		if [ "${isSame}" != "0" ] ; then 
 		    echo "Override old ${scriptC} not possible" 
 		    'rm' ${s} 
-#		    'cp' oldC/${scriptC}  newC/${scriptC}
 		    exit 37
 		fi
 		[ "${isSame}" == "0" ]  &&  mv -f ${s} newC/${scriptC}
@@ -193,7 +157,6 @@ ls -d [1-9]* | while read -r rn; do
 	fi
     done
     resE="$?"
-   #[ "$resE" != 0 ] && echo Exited with $resE && exit $resE
     (( resE > 20 )) && echo Exited with $resE && exit $resE
 done
 
