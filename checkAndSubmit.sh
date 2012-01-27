@@ -6,6 +6,22 @@ Dataset=$3
 DatasetSubDir=$4
 DatasetHadoopDir=$5
 
+#check for the existence of a few things before attempting to submit jobs
+if [ ! -f "$NtupleConfig" ]; then
+	echo "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs."
+	exit 1
+fi
+
+if [ ! -f "$UserProxy" ]; then
+	echo "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs."
+	exit 1
+fi
+
+if [ ! -O "$UserProxy" ]; then
+	echo "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs."
+	exit 1
+fi
+
 
 python getLFNList_reco.py --dataset=${Dataset}|grep .root  > ${DatasetSubDir}/a.runs.list.tmp.phedex
 

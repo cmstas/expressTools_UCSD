@@ -1,8 +1,8 @@
 #!/bin/bash
 
-. loadConfig.sh $1
+. loadConfig.sh $1  #load the configuration file specified by the user
 
-for Dataset in $Datasets; do
+for Dataset in $Datasets; do #loop over all of the datasets listed in the config file
 
 	MergingDir="/data/tmp/$USER"                                                     #location of the directory used for merging and logging
 	HadoopDir="/hadoop/cms/store/user/${HadoopUserDir}/${CMSSWRelease}_${CMS2Tag}"   #long term storage of ntupled datasets
@@ -47,10 +47,12 @@ for Dataset in $Datasets; do
 	[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/failed" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed
 	
 #	while [ 1 ]; do
-		echo $MergingDir
+	    #call the script to submit jobs
 		source checkAndSubmit.sh $1 $CMSSWDir $Dataset $DatasetSubDir $DatasetHadoopDir
 #		sleep 5400
 
+		echo $MergingDir
+		#call the script to merge output files
 		#source checkAndMerge.sh $1 $UnmergedDatasetDir $DatasetSubDir $MergingDir $MergedDatasetDir $DatasetDir
 #		sleep 5400
 #	done
