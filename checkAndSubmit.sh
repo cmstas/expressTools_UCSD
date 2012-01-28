@@ -102,7 +102,7 @@ if (( nToSub > 0 )) ; then
 # condor_submit expressTools_UCSD_${DatasetSubDir##*/}.cmd 
 
 
-	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetSubDir##*/}/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetSubDir##*/}/std_logs/ -p $UserProxy 
+	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetSubDir##*/}/submit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetSubDir##*/}/submit/std_logs/ -p $UserProxy 
   
 	done >& ${DatasetSubDir}/submitting_log/${subLog}
     curT=`date +%s`

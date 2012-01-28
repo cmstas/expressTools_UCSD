@@ -1,11 +1,19 @@
 . loadConfig.sh $1
 
+[ ! -d "${LogDir}" ] && echo Create ${LogDir} && mkdir -p ${LogDir}
+[ ! -d "$LogDir/error" ] && echo Create $LogDir/error && mkdir -p $LogDir/error && chmod 777 $LogDir/error
+[ ! -d "$LogDir/mismerging" ] && echo Create $LogDir/mismerging && mkdir -p $LogDir/mismerging && chmod 777 $LogDir/mismerging
+
+
 for Dataset in $Datasets; do
 
 	CurDir=$PWD
 	DatasetDirTmp=`echo $Dataset |sed -e 's?/?_?g' `
 	DatasetDir="${DatasetDirTmp:1}" 
+	HadoopDir="/hadoop/cms/store/user/${HadoopUserDir}/${CMSSWRelease}_${CMS2Tag}"   #long term storage of ntupled datasets
+	DatasetHadoopDir="${HadoopDir}/${DatasetDir}"                                        #full path to the hadoop dir where the dataset is stored
 	PhedexDir="/hadoop/cms/phedex"
+
 
 	fjr2json.py /hadoop/cms/store/user/$HadoopUserDir/${CMSSWRelease}_${CMS2Tag}/${DatasetDir}/${CMSSWRelease}_${CMS2Tag}/xml/*.xml >& $LogDir/${DatasetDir}_json
 	
@@ -51,19 +59,17 @@ for Dataset in $Datasets; do
 	if (( nToSub > 0 )) ; then
 		dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 		subLog=sub.log.${dateS}
-		'cp' ../expressTools_UCSD_${DatasetDir}.cmd expressTools_UCSD_${DatasetDir}_resubmit.cmd
+		#'cp' ../expressTools_UCSD_${DatasetDir}.cmd expressTools_UCSD_${DatasetDir}_resubmit.cmd
 		grep store a.list.new.resubmit | while read -r rn f; do 
-			input_data=`echo root://xrootd.unl.edu/$f `
-			python ../resubmit.py expressTools_UCSD_${DatasetDir}_resubmit.cmd ${input_data}
+			input_data="root://xrootd.unl.edu/$f"
+			#python ../resubmit.py expressTools_UCSD_${DatasetDir}_resubmit.cmd ${input_data}
 			echo ${input_data}
-			cd ${CurDir}
+			#cd ${CurDir}
 #	condor_submit ${DatasetDir}/expressTools_UCSD_${DatasetDir}_resubmit.cmd
-			cd ${CurDir}/${DatasetDir}
+			../submit.sh -e ../runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_${CMS2Tag} $CMS2Tar $CMS2Tag $Dataset" -i "../$NtupleConfig,../$CMS2Tar" -u $DatasetDir -l /data/tmp/${USER}/${DatasetDir}/resubmit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/resubmit/std_logs/ -p $UserProxy 
+			#cd ${CurDir}/${DatasetDir}
 		done >& submitting_log/${subLog}
 	fi
-
-	[ ! -d "$LogDir/error" ] && mkdir -p $LogDir/error && chmod 777 $LogDir/error
-	[ ! -d "$LogDir/mismerging" ] && mkdir -p $LogDir/mismerging && chmod 777 $LogDir/mismerging
 	
 	
 	
