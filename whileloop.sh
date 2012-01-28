@@ -40,6 +40,7 @@ for Dataset in $Datasets; do #loop over all of the datasets listed in the config
 	[ ! -d "$NFSDir/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create $NFSDir/${DatasetDir}/${CMS2Tag}/temp && mkdir $NFSDir/${DatasetDir}/${CMS2Tag}/temp
 	
 	#set up temp mergind directories
+	#may want to eventually change this path to something better than datasetname/tag
 	[ ! -d "${MergingDir}" ] && echo Create  ${MergingDir} && mkdir ${MergingDir}
 	[ ! -d "${MergingDir}/${DatasetDir}" ] && echo Create  ${MergingDir}/${DatasetDir} && mkdir ${MergingDir}/${DatasetDir}
 	[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag} && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}

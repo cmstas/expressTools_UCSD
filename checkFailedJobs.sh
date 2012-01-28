@@ -2,8 +2,6 @@
 
 for Dataset in $Datasets; do
 
-#### USER SET VARIABLES ####
-	
 	CurDir=$PWD
 	DatasetDirTmp=`echo $Dataset |sed -e 's?/?_?g' `
 	DatasetDir="${DatasetDirTmp:1}" 

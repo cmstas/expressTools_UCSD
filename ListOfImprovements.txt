@@ -4,7 +4,7 @@ Changes to Function:
 3) Add sweeproot.C to our script to validate ntuples as they come out.
 4) Check for available disk space. Move and skim and ntuple smartly. Before it will try to skim and merge onto full disks. Must test for this and include error handling.
 DONE 5) Add a configuration file with user set variables and the necessary script to read it and set variables so the users don't have to edit code to run it. Ian has already written this (not the python one, but a new bash one that can seemlessly be implemented in the bash code). It needs to be added into the scripts.
-6) Store .out/.err log files on /data/tmp so that they don't wast home space and so Terrence doesn't need to back them up.
+DONE 6) Store .out/.err log files on /data/tmp so that they don't wast home space and so Terrence doesn't need to back them up.
 7) Change output path for the files. The CMSSW release and CMS2 tag appears in the path too many times.
   something like /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/unmerged/
                  /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/merged/
@@ -21,7 +21,7 @@ DONE 2) Move all variables that need to be set by the user to run to the front o
 3) In the resubmit script don't use a python script to modify the command file, hard code into the bash script a way to do this.
 DONE 4) Replace the libMiniFWLite.so with a variable that can be set by the user. 
 DONE 5) Check if the specified configuration file Data*_cfg.py exists. Don't ntuple if it isn't in the folder. Throw a warning to the user.
-6) In checkAndSubmit.sh put the section that produces the .cmd file in it's own section. Ask Ian, he has this mostly written.
+DONE 6) In checkAndSubmit.sh put the section that produces the .cmd file in it's own section. Ask Ian, he has this mostly written.
 DONE 7) In checkFailedJobs.sh, we don't need to check for each skim individually, we can put this in a loop and have a list of skims to check. Make this more general.
 DONE 8) Can probably do something like what is being done in 10 for checkAndRunSkim.sh
 9) There are some changes to make to checkAndMerge.sh, but since we're eliminating this, we shouldn't have to do it.

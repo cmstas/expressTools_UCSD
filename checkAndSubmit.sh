@@ -78,29 +78,33 @@ if (( nToSub > 0 )) ; then
 	#the run script takes arguments: baseReleaseDirectory configFile inputFile extensionToOutputFile
 	#the output file will be a legal version of the inputFile name with : and / replaced by _ (see the script)
 
-cat > expressTools_UCSD_${DatasetSubDir##*/}.cmd <<@EOF
-universe=vanilla
-executable=$PWD/runFromOneCfg_noEvCheck.sh
-arguments=$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset
-transfer_executable=True
-when_to_transfer_output = ON_EXIT
-#the actual executable to run is not transfered by its name.
-#In fact, some sites may do weird things like renaming it and such.
-transfer_input_files = $PWD/$NtupleConfig,$PWD/$CMS2Tar
-+DESIRED_Sites="UCSD" 
-+Owner = undefined 
-log=/data/tmp/$USER/${DatasetSubDir##*/}/${CMS2Tag}/condor_submit.log
-output = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).out
-error  = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).err
-notification=Never
-#x509userproxy=$ENV(X509_USER_PROXY)	
-x509userproxy=$UserProxy
-queue
+# cat > expressTools_UCSD_${DatasetSubDir##*/}.cmd <<@EOF
+# universe=vanilla
+# executable=$PWD/runFromOneCfg_noEvCheck.sh
+# arguments=$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset
+# transfer_executable=True
+# when_to_transfer_output = ON_EXIT
+# #the actual executable to run is not transfered by its name.
+# #In fact, some sites may do weird things like renaming it and such.
+# transfer_input_files = $PWD/$NtupleConfig,$PWD/$CMS2Tar
+# +DESIRED_Sites="UCSD" 
+# +Owner = undefined 
+# log=/data/tmp/$USER/${DatasetSubDir##*/}/${CMS2Tag}/condor_submit.log
+# output = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).out
+# error  = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).err
+# notification=Never
+# #x509userproxy=$ENV(X509_USER_PROXY)	
+# x509userproxy=$UserProxy
+# queue
 	
-@EOF
+# @EOF
 	
-condor_submit expressTools_UCSD_${DatasetSubDir##*/}.cmd 
-    done >& ${DatasetSubDir}/submitting_log/${subLog}
+# condor_submit expressTools_UCSD_${DatasetSubDir##*/}.cmd 
+
+
+	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetSubDir##*/}/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetSubDir##*/}/std_logs/ -p $UserProxy 
+  
+	done >& ${DatasetSubDir}/submitting_log/${subLog}
     curT=`date +%s`
    
 fi
