@@ -48,7 +48,7 @@ for Dataset in $Datasets; do
 
 
     [ ! -f "a.list.resubmit" ]  && echo Create a.list.resubmit && touch a.list.resubmit
-	cat $LogDir/${DatasetDir}_missing_files_20h |grep .root > a.runs.list0.tmp.resubmit
+	cat $LogDir/${DatasetDir}_missing_files_20h $LogDir/${DatasetDir}_missing_files_20h_non_ucsd | grep .root | sort | uniq > a.runs.list0.tmp.resubmit
 	'cp' a.list.resubmit a.list.old.resubmit
 	'cp' a.runs.list0.tmp.resubmit a.list.resubmit
 	'rm' -f a.list.new.resubmit; touch a.list.new.resubmit; grep store a.list.resubmit | while read -r rn f; do grep $f a.list.old.resubmit >& /dev/null || echo $rn $f >> a.list.new.resubmit; done
