@@ -8,10 +8,24 @@ DatasetDir=$6
 
 
 
+
 TOOL_DIR=$PWD  #will need to carry this over from the other scripts. change it later.
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 echo Start Merging
 echo $dateS
+
+if [ ! -f $LibMiniFWLite ]; then
+	echo "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting."
+	exit 1
+fi
+FreeSpace=`df /data/tmp | grep -v "Filesystem" | awk '{print $4}'`
+if [ $FreeSpace -lt $MergeSpace ]; then 
+	echo "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting."
+	echo "If the threshold is too high, you may change the required space in config $1 by modifying variable MergeSpace."
+	exit 1
+fi
+
+
 
 cd $DatasetSubDir
 # get list of files which were not linked to the grouped
