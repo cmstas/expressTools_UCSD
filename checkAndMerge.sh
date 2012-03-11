@@ -1,27 +1,69 @@
+#! /bin/bash
 
 . loadConfig.sh $1
-UnmergedDatasetDir=$2
-DatasetSubDir=$3
-MergingDir=$4
-MergedDatasetDir=$5
-DatasetDir=$6
+Dataset=$2
+
+StartDir="$PWD"
+DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+DatasetDir="${DatasetDir_tmp:1}"                                                 #dataset name with "/" replaced with "_", used as the dir name for the dataset ntuples
+
+DatasetSubDir=${StartDir}/${DatasetDir}_${CMSSWRelease}_${CMS2Tag}               #location where the accounting is done to keep track of which files have been ntupled, merged, etc
+MergingDir="/data/tmp/$USER"                                                     #location of the directory used for merging and logging
+HadoopDir="/hadoop/cms/store/user/${HadoopUserDir}/${CMSSWRelease}_${CMS2Tag}"   #long term storage of ntupled datasets
+DatasetHadoopDir="${HadoopDir}/${DatasetDir}"                                        #full path to the hadoop dir where the dataset is stored
+UnmergedDatasetDir="${DatasetHadoopDir}/unmerged"                  #location of unmerged ntuples on hadoop
+MergedDatasetDir="${DatasetHadoopDir}/merged"  #location of the merged nutples on hadoop
 
 
+#set up accounting directories
+[ ! -d "${DatasetSubDir}" ] && echo Create ${DatasetSubDir} && mkdir ${DatasetSubDir}
+[ ! -d "${DatasetSubDir}/newC" ] && echo Create ${DatasetSubDir}/newC && mkdir ${DatasetSubDir}/newC
+[ ! -d "${DatasetSubDir}/oldC" ] && echo Create ${DatasetSubDir}/oldC && mkdir ${DatasetSubDir}/oldC
+[ ! -d "${DatasetSubDir}/merging_log" ] && echo Create ${DatasetSubDir}/merging_log && mkdir ${DatasetSubDir}/merging_log
 
+#set up hadoop directories
+[ ! -d "${HadoopDir}" ] && echo Create ${HadoopDir} && mkdir ${HadoopDir}
+[ ! -d "${DatasetHadoopDir}" ] && echo Create ${DatasetHadoopDir} && mkdir ${DatasetHadoopDir}
+[ ! -d "${UnmergedDatasetDir}" ] && echo Create ${UnmergedDatasetDir} && mkdir -p ${UnmergedDatasetDir}
+[ ! -d "${MergedDatasetDir}" ] && echo Create ${MergedDatasetDir} && mkdir -p ${MergedDatasetDir}
+[ ! -d "${MergedDatasetDir}/temp" ] && echo Create ${MergedDatasetDir}/temp && mkdir ${MergedDatasetDir}/temp
 
-TOOL_DIR=$PWD  #will need to carry this over from the other scripts. change it later.
+#set up temp mergind directories
+#may want to eventually change this path to something better than datasetname/tag
+[ ! -d "${MergingDir}" ] && echo Create  ${MergingDir} && mkdir ${MergingDir}
+[ ! -d "${MergingDir}/${DatasetDir}" ] && echo Create  ${MergingDir}/${DatasetDir} && mkdir ${MergingDir}/${DatasetDir}
+[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag} && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}
+[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/temp" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp
+[ ! -d "${MergingDir}/${DatasetDir}/${CMS2Tag}/failed" ] && echo Create  ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed && mkdir ${MergingDir}/${DatasetDir}/${CMS2Tag}/failed
+
+[ ! -f $DatasetSubDir/a.runs.list.tmp ] && echo Create $DatasetSubDir/a.runs.list.tmp && touch $DatasetSubDir/a.runs.list.tmp
+
+##### Set up a cmssw environment. This will set up root for the merging. Probably could do this in a more controlled way (you know, without including the kitchen sink), but that is for a later date. #####
+if [ ! -d $CMSSWLocation ]; then
+	echo "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Exiting."
+	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"
+	exit 1
+fi
+cd $CMSSWLocation
+eval `scramv1 runtime -sh`
+cd -
+#############################################
+
+TOOL_DIR=$PWD  
 dateS=`date '+%Y.%m.%d-%H.%M.%S'`
 echo Start Merging
 echo $dateS
 
 if [ ! -f $LibMiniFWLite ]; then
 	echo "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting."
+	which mail >& /dev/null && mail -s "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting." "$UserEmail"
 	exit 1
 fi
 FreeSpace=`df /data/tmp | grep -v "Filesystem" | awk '{print $4}'`
 if [ $FreeSpace -lt $MergeSpace ]; then 
 	echo "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting."
 	echo "If the threshold is too high, you may change the required space in config $1 by modifying variable MergeSpace."
+	which mail >& /dev/null && mail -s "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting." "$UserEmail" < `echo "If the threshold is too high, you may change the required space in config $1 by modifying variable MergeSpace."`
 	exit 1
 fi
 
@@ -30,7 +72,7 @@ fi
 cd $DatasetSubDir
 # get list of files which were not linked to the grouped
 [ ! -f "grouped.list" ]  && touch grouped.list
-cat grouped.list |grep ".root" >files.grouped
+cat grouped.list | grep ".root" > files.grouped
 ls ${UnmergedDatasetDir} | grep  ".root" |grep -v ".log" |while read -r f; do
 grep ${f} files.grouped >& /dev/null || echo ${f} ; done >files.ls
 

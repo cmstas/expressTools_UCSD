@@ -1,29 +1,60 @@
 #!/bin/bash
 
 . loadConfig.sh $1
-CMSSWDir=$2
-Dataset=$3
-DatasetSubDir=$4
-DatasetHadoopDir=$5
+Dataset=$2
+
+StartDir="$PWD"
+DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+DatasetDir="${DatasetDir_tmp:1}"                                                 #dataset name with "/" replaced with "_", used as the dir name for the dataset ntuples
+HadoopDir="/hadoop/cms/store/user/${HadoopUserDir}/${CMSSWRelease}_${CMS2Tag}"   #long term storage of ntupled datasets
+DatasetHadoopDir="${HadoopDir}/${DatasetDir}"                                    #full path to the hadoop dir where the dataset is stored
+DatasetSubDir=${StartDir}/${DatasetDir}_${CMSSWRelease}_${CMS2Tag}               #location where the accounting is done to keep track of which files have been ntupled, merged, etc
+UnmergedDatasetDir="${DatasetHadoopDir}/unmerged"                                #location of unmerged ntuples on hadoop
+MergedDatasetDir="${DatasetHadoopDir}/merged"                                    #location of the merged nutples on hadoop
+
+#set up accounting directories
+[ ! -d "${DatasetSubDir}" ] && echo Create ${DatasetSubDir} && mkdir ${DatasetSubDir}
+[ ! -f "${DatasetSubDir}/a.list" ]  && echo Create ${DatasetSubDir}/a.list && touch ${DatasetSubDir}/a.list
+[ ! -d "${DatasetSubDir}/submitting_log" ] && echo Create ${DatasetSubDir}/submitting_log && mkdir ${DatasetSubDir}/submitting_log
+	
+#set up hadoop directories
+[ ! -d "${HadoopDir}" ] && echo Create ${HadoopDir} && mkdir ${HadoopDir}
+[ ! -d "${DatasetHadoopDir}" ] && echo Create ${DatasetHadoopDir} && mkdir ${DatasetHadoopDir}
+[ ! -d "${UnmergedDatasetDir}" ] && echo Create ${UnmergedDatasetDir} && mkdir -p ${UnmergedDatasetDir}
+
 
 #check for the existence of a few things before attempting to submit jobs
 if [ ! -f "$NtupleConfig" ]; then
 	echo "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs."
+	which mail >& /dev/null && mail -s "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs." "$UserEmail"
 	exit 1
 fi
 
 if [ ! -f "$UserProxy" ]; then
 	echo "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs."
+	which mail >& /dev/null && mail -s "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs." "$UserEmail"
 	exit 1
 fi
 
 if [ ! -O "$UserProxy" ]; then
 	echo "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs."
+	which mail >& /dev/null && mail -s "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs." "$UserEmail"
 	exit 1
 fi
 
+##### Set up a cmssw environment. This will set up root for the merging. Probably could do this in a more controlled way (you know, without including the kitchen sink), but that is for a later date. #####
+if [ ! -d $CMSSWLocation ]; then
+	echo "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Exiting."
+	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"
+	exit 1
+fi
+cd $CMSSWLocation
+eval `scramv1 runtime -sh`
+cd -
+#############################################
 
-python getLFNList_reco.py --dataset=${Dataset}|grep .root  > ${DatasetSubDir}/a.runs.list.tmp.phedex
+
+python getLFNList_reco.py --dataset=${Dataset} | grep .root  > ${DatasetSubDir}/a.runs.list.tmp.phedex #This python script shouldn't require anything special to run, but if it fails, it may require a valid cms environment. The json module didn't used to be included in the standard python install on uaf, but  now seems to be.
 
 
 dbslist=`dbsql "find run, file where file.status=VALID and dataset=$Dataset and  run >=${MinRunNumber} and run <=${MaxRunNumber}"`
@@ -46,7 +77,7 @@ else
 fi
 
 
-cat ${DatasetSubDir}/a.runs.list.tmp |grep .root > ${DatasetSubDir}/a.runs.list0.tmp
+cat ${DatasetSubDir}/a.runs.list.tmp | grep .root > ${DatasetSubDir}/a.runs.list0.tmp
 
 'cp' ${DatasetSubDir}/a.list ${DatasetSubDir}/a.list.old
 'cp' ${DatasetSubDir}/a.runs.list0.tmp ${DatasetSubDir}/a.list
@@ -78,31 +109,8 @@ if (( nToSub > 0 )) ; then
 	#the run script takes arguments: baseReleaseDirectory configFile inputFile extensionToOutputFile
 	#the output file will be a legal version of the inputFile name with : and / replaced by _ (see the script)
 
-# cat > expressTools_UCSD_${DatasetSubDir##*/}.cmd <<@EOF
-# universe=vanilla
-# executable=$PWD/runFromOneCfg_noEvCheck.sh
-# arguments=$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset
-# transfer_executable=True
-# when_to_transfer_output = ON_EXIT
-# #the actual executable to run is not transfered by its name.
-# #In fact, some sites may do weird things like renaming it and such.
-# transfer_input_files = $PWD/$NtupleConfig,$PWD/$CMS2Tar
-# +DESIRED_Sites="UCSD" 
-# +Owner = undefined 
-# log=/data/tmp/$USER/${DatasetSubDir##*/}/${CMS2Tag}/condor_submit.log
-# output = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).out
-# error  = ${DatasetSubDir}/output/1e.\$(Cluster).\$(Process).err
-# notification=Never
-# #x509userproxy=$ENV(X509_USER_PROXY)	
-# x509userproxy=$UserProxy
-# queue
-	
-# @EOF
-	
-# condor_submit expressTools_UCSD_${DatasetSubDir##*/}.cmd 
 
-
-	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/${CMSSWRelease}_$CMS2Tag $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetSubDir##*/}/submit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetSubDir##*/}/submit/std_logs/ -p $UserProxy 
+	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/unmerged $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetDir}/submit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/submit/std_logs/ -p $UserProxy 
   
 	done >& ${DatasetSubDir}/submitting_log/${subLog}
     curT=`date +%s`

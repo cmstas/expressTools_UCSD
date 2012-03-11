@@ -8,10 +8,37 @@ source /data/vdt/setup.sh
 ConfigFiles=$@ #list of config files specified by the user on the command line
 echo $ConfigFiles
 
-for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
-	source whileloop.sh $Config &  #want to remove the source and change to ./ , need to investigate whether the exports and source for vdt above must be in all other scripts
-	echo "whileloop.sh PID=$! for config $Config."
+#while [ 1 ]; do
+	for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
+		. loadConfig.sh $Config  #load the configuration file specified by the user
+		for Dataset in $Datasets; do #loop over all of the datasets listed in the config file
+	        #call the script to submit jobs
+			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+			DatasetDir="${DatasetDir_tmp:1}"
+			mkdir -p /data/tmp/${USER}/${DatasetDir}
+			touch /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log
+			./checkAndSubmit.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log 2>&1 &
+		done
+		sleep 5400
 
+		for Dataset in $Datasets; do
+			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+			DatasetDir="${DatasetDir_tmp:1}"
+			#echo $MergingDir
+		    #call the script to merge output files
+			touch /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log
+			./checkAndMerge.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log 2>&1 # don't merge in the background, do one dataset at a time so as not to kill the system
+		done
+		sleep 15
+		for Dataset in $Datasets; do
+			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
+			DatasetDir="${DatasetDir_tmp:1}"
+			#call the script to check for erros in the merging step
+			touch /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log
+			./checkMergeErrors.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log 2>&1 &
+		done
+		sleep 5400
+	done
 done
 
 
