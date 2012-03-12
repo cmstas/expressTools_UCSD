@@ -8,7 +8,7 @@ source /data/vdt/setup.sh
 ConfigFiles=$@ #list of config files specified by the user on the command line
 echo $ConfigFiles
 
-#while [ 1 ]; do
+while [ 1 ]; do
 	for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
 		. loadConfig.sh $Config  #load the configuration file specified by the user
 		for Dataset in $Datasets; do #loop over all of the datasets listed in the config file
