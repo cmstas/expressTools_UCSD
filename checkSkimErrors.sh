@@ -8,6 +8,7 @@ DatasetDir=`echo ${DatasetDirTmp:1} `
 echo looking for skim Error
 #ls ${NFSDir} >& /dev/null #why is this here?
 
+$SkimFilters=`echo $SkimFilters | sed 's/,/ /g'`
 for SkimFilter in $SkimFilters; do
 	SkimDir=${SkimFilter#ntupleFilter}
 	SkimDir=${SkimDir%.cc}

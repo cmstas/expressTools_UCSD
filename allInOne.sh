@@ -11,6 +11,7 @@ echo $ConfigFiles
 while [ 1 ]; do
 	for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
 		. loadConfig.sh $Config  #load the configuration file specified by the user
+		$Datasets=`echo $Datasets | sed 's/,/ /g'`
 		for Dataset in $Datasets; do #loop over all of the datasets listed in the config file
 	        #call the script to submit jobs
 			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `

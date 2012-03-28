@@ -9,6 +9,7 @@ ConfigFiles=$@
 while [ 1 ]; do
 	for Config in $ConfigFiles; do
 		. loadConfig.sh $Config
+                $Datasets=`echo $Datasets | sed 's/,/ /g'`
 		for Dataset in $Datasets; do
 			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
 			DatasetDir="${DatasetDir_tmp:1}"

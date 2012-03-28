@@ -28,7 +28,7 @@ eval `scramv1 runtime -sh`
 cd -
 #############################################
 
-
+$SkimFilters=`echo $SkimFilters | sed 's/,/ /g'`
 for SkimFilter in $SkimFilters; do
 	SkimDir=${SkimFilter%.cc}
 	SkimDir=${SkimDir#ntupleFilter}
