@@ -1,7 +1,7 @@
 #! /bin/bash
 
 : ${1?"No specified CMSSW Release and location (arg 1). Exiting"}
-: ${2?"No specified location to move the tarred NtupleMaker Code (arg2). Exiting"}
+: ${2?"No specified location into which to move the libminifwlite (arg2). Exiting"}
 
 LONGCMSSW=$1
 SHORTCMSSW=${LONGCMSSW##*/}
@@ -22,24 +22,24 @@ if [ ! -d "$OUTLOCATION" ]; then
 	exit 1
 fi
 
-echo "Don't know if the CMS2 release is built. Will cd into the release area, set CMSSW environment, and run scram to be safe."
-cd $LONGCMSSW
+
+cd ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite
 eval `scram runtime -sh`
-scramv1 b -j 25
+make
+
 ERROR=$?
 if [ "$ERROR" != 0 ]; then
-	echo "Error building CMS2. Exiting."
+	"Error making, ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite/Makefile. Exiting"
 	exit $ERROR
 fi
+
 cd -
 
-echo "Tarring the file now."
-tar -cvz --exclude NtupleMacros -f ${OUTLOCATION}/${SHORTCMSSW}.tgz $LONGCMSSW
+cp ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite/libMiniFWLite.so ${OUTLOCATION}/libMiniFWLite_${SHORTCMSSW}.so
 
 ERROR=$?
-
 if [ "$ERROR" != 0 ]; then
-	"Error tarring, $LONGCMSSW. Exiting"
+	"Error ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite/libMiniFWLite.so to ${OUTLOCATION}/libMiniFWLite_${SHORTCMSSW}.so. Exiting"
 	exit $ERROR
 fi
 
