@@ -39,9 +39,13 @@ location=$3
 printf "%20s  %s\n" "Checkout Location:" "$location"
 full_name="${release}_${tag}"
 if [ ! -d "$location" ]; then
-	die 1 "Specified Checkout Location, $location, does not exist. Exiting"
+    echo "Specified checkout location, $location, does not exist. Creating dir now."
+    mkdir -p $location
 fi
 
+if [ ! -d "$location" ]; then
+    die 1 "Failed to make dir, $locatio. Exiting"
+fi
 
 cd "$location" 
 source /code/osgcode/cmssoft/cmsset_default.sh  > /dev/null 2>&1
