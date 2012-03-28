@@ -142,7 +142,7 @@ done
 IFS=$OLDIFS
 
 if [ "$file_exists" = 0 ]; then
-	die 1 "ERROR: Exiting do to previous non-existend file(s)."
+	die 1 "ERROR: Exiting do to previous non-existent file(s)."
 fi
 
 
