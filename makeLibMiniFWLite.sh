@@ -24,7 +24,7 @@ fi
 
 
 cd ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite
-eval `scram runtime -sh`
+#eval `scram runtime -sh` #if you get errors, you may need to add this line back in and add an argument to the script for the scram_arch
 make
 
 ERROR=$?
