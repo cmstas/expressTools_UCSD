@@ -1,7 +1,8 @@
 #### !/usr/local/bin/bash
 #set up some preliminaries
 source /code/osgcode/cmssoft/cmsset_default.sh  > /dev/null 2>&1
-export SCRAM_ARCH=slc5_amd64_gcc434
+#export SCRAM_ARCH=slc5_amd64_gcc434
+export SCRAM_ARCH=slc5_amd64_gcc462
 echo $SCRAM_ARCH
 
 #scram list
