@@ -2,10 +2,12 @@
 
 : ${1?"No specified CMSSW Release and location (arg 1). Exiting"}
 : ${2?"No specified location to move the tarred NtupleMaker Code (arg2). Exiting"}
+: ${3?"No specified SCRAM_ARCH (arg 3). Exiting"}
 
 LONGCMSSW=$1
 SHORTCMSSW=${LONGCMSSW##*/}
 OUTLOCATION=$2
+export SCRAM_ARCH=$3
 
 if [ ! -d "$LONGCMSSW" ]; then
 	echo "Error. Cannot find specified CMSSW release, $LONGCMSSW."
