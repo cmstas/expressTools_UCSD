@@ -33,10 +33,10 @@ if [ "$ERROR" != 0 ]; then
 	echo "Error building CMS2. Exiting."
 	exit $ERROR
 fi
-cd -
+
 
 echo "Tarring the file now."
-tar -cvz --exclude NtupleMacros -f ${OUTLOCATION}/${SHORTCMSSW}.tgz $LONGCMSSW
+tar -cvz --exclude NtupleMacros -f ${SHORTCMSSW}.tgz *
 
 ERROR=$?
 
@@ -44,5 +44,8 @@ if [ "$ERROR" != 0 ]; then
 	"Error tarring, $LONGCMSSW. Exiting"
 	exit $ERROR
 fi
+
+cd -
+mv ${LONGCMSSW}/${SHORTCMSSW}.tgz ${OUTLOCATION}
 
 exit 0
