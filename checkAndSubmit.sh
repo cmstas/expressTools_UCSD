@@ -110,7 +110,7 @@ if (( nToSub > 0 )) ; then
 	#the output file will be a legal version of the inputFile name with : and / replaced by _ (see the script)
 
 
-	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/unmerged $CMS2Tar $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetDir}/submit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/submit/std_logs/ -p $UserProxy 
+	./submit.sh -e $PWD/runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease ${NtupleConfig##*/} $input_data ${DatasetHadoopDir}/unmerged ${CMS2Tar##*/} $CMS2Tag $Dataset" -i "$PWD/$NtupleConfig,$PWD/$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetDir}/submit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/submit/std_logs/ -p $UserProxy 
   
 	done >& ${DatasetSubDir}/submitting_log/${subLog}
     curT=`date +%s`

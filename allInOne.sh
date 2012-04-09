@@ -1,4 +1,4 @@
-©#!/bin/bash
+#!/bin/bash
 #source some initial things for working with the grid 
 export VDT_LOCATION=/data/vdt
 export EDG_WL_LOCATION=$VDT_LOCATION/edg

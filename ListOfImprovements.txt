@@ -1,15 +1,10 @@
  -- TO DO --
 * COMMENT THE SCRIPTS
 * Add sweeproot.C to our script to validate ntuples as they come out.
-* Change output path for the files. The CMSSW release and CMS2 tag appears in the path too many times.
-          something like /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/unmerged/
-                         /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/merged/
-* Move the lines that create nfs dirs to allskim, move the lines that create merged dirs to checkAndMerge
 * Remove merging step. Just skim. This will mean that there will be more and smaller files on hadoop (pre-skim).
 * Change scripts to do skimming on the cluster and use xrdcp to copy the files off of it.
 * make a seperate .C file to do merging, call it from shell script instead of printing it out???
 * in merging use libminifwlite, or if can't find use fwlite from CMSSW environ if set, or if neither throw an error
-* A script to create a new version of libMiniFWLite based on a CMSSW release and tag number.
 * Modify compareGoodRun2Data.py to take a run range to do the comparison within. We can add missing lumi sections and run numbers to the monitoring page (I know this isn't entirely accurate, but is still a nice cross check to have).
 * Add option to use xrootd or use a local accessor.
 * Expand ntupling to use more sites than just ucsd (not entirely sure what is involved in this, but i think will be complex). Use only reliable sites.
@@ -33,3 +28,8 @@
 * in merging test for existence of libminifwlit. if it doesn't exist, exit.
 * Change the max size of merged files to something managable, choose 8 Gb for now since I think the grid has a 10 Gb size limit for jobs. May want to revisit this.
 * Check for available disk space. Move and skim smartly. Before it will try to skim onto full disks. Must test for this and include error handling.
+* Change output path for the files. The CMSSW release and CMS2 tag appears in the path too many times.
+          something like /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/unmerged/
+                         /hadoop/.../CMSSW_4_2_4/V04-02-22/Photon_Run2011A-PromptReco-v4_AOD/merged/
+* Move the lines that create nfs dirs to allskim, move the lines that create merged dirs to checkAndMerge
+* A script to create a new version of libMiniFWLite based on a CMSSW release and tag number.
