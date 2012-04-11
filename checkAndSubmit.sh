@@ -26,26 +26,26 @@ MergedDatasetDir="${DatasetHadoopDir}/merged"                                   
 #check for the existence of a few things before attempting to submit jobs
 if [ ! -f "$NtupleConfig" ]; then
 	echo "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs."
-	which mail >& /dev/null && mail -s "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs." "$UserEmail"
+	which mail >& /dev/null && mail -s "ERROR: Specified _cfg.py file \"$NtupleConfig\" does not exist. Will not submit jobs." "$UserEmail" < /dev/null
 	exit 1
 fi
 
 if [ ! -f "$UserProxy" ]; then
 	echo "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs."
-	which mail >& /dev/null && mail -s "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs." "$UserEmail"
+	which mail >& /dev/null && mail -s "ERROR: Specified proxy \"$UserProxy\" does not exist. Will not submit jobs." "$UserEmail" < /dev/null
 	exit 1
 fi
 
 if [ ! -O "$UserProxy" ]; then
 	echo "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs."
-	which mail >& /dev/null && mail -s "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs." "$UserEmail"
+	which mail >& /dev/null && mail -s "ERROR: The current user $USER does own the specified proxy \"$UserProxy\". Will not submit jobs." "$UserEmail" < /dev/null
 	exit 1
 fi
 
 ##### Set up a cmssw environment. This will set up root for the merging. Probably could do this in a more controlled way (you know, without including the kitchen sink), but that is for a later date. #####
 if [ ! -d $CMSSWLocation ]; then
 	echo "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Exiting."
-	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"
+	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail" < /dev/null
 	exit 1
 fi
 cd $CMSSWLocation
