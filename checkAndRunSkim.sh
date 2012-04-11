@@ -20,7 +20,7 @@ NFSDatasetDir="${NFSDir}/${DatasetDir}/${CMS2Tag}"
 ##### Set up a cmssw environment. This will set up root for the skimming. Probably could do this in a more controlled way (you know, without including the kitchen sink), but that is for a later date. #####
 if [ ! -d $CMSSWLocation ]; then
 	echo "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Exiting."
-	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"
+	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail" < /dev/null
 	exit 1
 fi
 cd $CMSSWLocation

@@ -41,7 +41,7 @@ MergedDatasetDir="${DatasetHadoopDir}/merged"  #location of the merged nutples o
 ##### Set up a cmssw environment. This will set up root for the merging. Probably could do this in a more controlled way (you know, without including the kitchen sink), but that is for a later date. #####
 if [ ! -d $CMSSWLocation ]; then
 	echo "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Exiting."
-	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"
+	which mail >& /dev/null && mail -s "Error: Cannot find directory for checked out CMSSW Location, $CMSSWLocation. Will not merge any files, since we need to set up a CMSSW environment." "$UserEmail"  < /dev/null
 	exit 1
 fi
 cd $CMSSWLocation
@@ -56,7 +56,7 @@ echo $dateS
 
 if [ ! -f $LibMiniFWLite ]; then
 	echo "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting."
-	which mail >& /dev/null && mail -s "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting." "$UserEmail"
+	which mail >& /dev/null && mail -s "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting." "$UserEmail"  < /dev/null
 	exit 1
 fi
 FreeSpace=`df /data/tmp | grep -v "Filesystem" | awk '{print $4}'`
