@@ -2,6 +2,7 @@
 
 : ${1?"No specified CMSSW Release and location (arg 1). Exiting"}
 : ${2?"No specified location into which to move the libminifwlite (arg2). Exiting"}
+: ${3?"No specified SCRAM_ARCH (arg3). Exiting"}
 
 LONGCMSSW=$1
 SHORTCMSSW=${LONGCMSSW##*/}
@@ -24,7 +25,8 @@ fi
 
 
 cd ${LONGCMSSW}/src/CMS2/NtupleMacros/Tools/MiniFWLite
-#eval `scram runtime -sh` #if you get errors, you may need to add this line back in and add an argument to the script for the scram_arch
+SCRAM_ARCH=$3
+eval `scram runtime -sh` #make depends on the root version to make code that has root includes
 make
 
 ERROR=$?
