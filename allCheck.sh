@@ -14,7 +14,7 @@ while [ 1 ]; do
 			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
 			DatasetDir="${DatasetDir_tmp:1}"
 			touch /data/tmp/${USER}/${DatasetDir}/checkFailedJobs.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkFailedJobs.log
-			./checkFailedJobs.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkFailedJobs.log 2>&1 &
+			./checkFailedJobs.sh $Config $Dataset 2>&1 | appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkFailedJobs.log &
 			echo "checkFailedJobs.sh PID is $$"
 		done
 		sleep 5400

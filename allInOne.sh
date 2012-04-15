@@ -18,7 +18,7 @@ while [ 1 ]; do
 			DatasetDir="${DatasetDir_tmp:1}"
 			mkdir -p /data/tmp/${USER}/${DatasetDir}
 			touch /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log
-			./checkAndSubmit.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log 2>&1 &
+			./checkAndSubmit.sh $Config $Dataset 2>&1 | appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkAndSubmit.log &
 		done
 		sleep 5400
 
@@ -28,7 +28,7 @@ while [ 1 ]; do
 			#echo $MergingDir
 		    #call the script to merge output files
 			touch /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log
-			./checkAndMerge.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log 2>&1 # don't merge in the background, do one dataset at a time so as not to kill the system
+			./checkAndMerge.sh $Config $Dataset 2>&1 | appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log  # don't merge in the background, do one dataset at a time so as not to kill the system
 		done
 		sleep 15
 		for Dataset in $Datasets; do
@@ -36,7 +36,7 @@ while [ 1 ]; do
 			DatasetDir="${DatasetDir_tmp:1}"
 			#call the script to check for erros in the merging step
 			touch /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log
-			./checkMergeErrors.sh $Config $Dataset >> /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log 2>&1 &
+			./checkMergeErrors.sh $Config $Dataset 2>&1 | appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log &
 		done
 		sleep 5400
 	done
