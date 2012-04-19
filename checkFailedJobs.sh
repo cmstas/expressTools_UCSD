@@ -83,7 +83,7 @@ if (( nToSub > 0 )) ; then
 	grep store a.list.new.resubmit | while read -r rn f; do 
 		input_data="root://xrootd.unl.edu/$f"
 		echo ${input_data}
-		../submit.sh -e ../runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/unmerged $CMS2Tar $CMS2Tag $Dataset" -i "../$NtupleConfig,../$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetDir}/resubmit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/resubmit/std_logs/ -p $UserProxy 
+		../submit.sh -e ../runFromOneCfg_noEvCheck.sh -a "$CMSSWRelease $NtupleConfig $input_data ${DatasetHadoopDir}/unmerged ${CMS2Tar##*/} $CMS2Tag $Dataset" -i "../$NtupleConfig,../$CMS2Tar" -u ${DatasetSubDir##*/} -l /data/tmp/${USER}/${DatasetDir}/resubmit/condor_submit_logs/condor_submit_$dateS.log -L /data/tmp/${USER}/${DatasetDir}/resubmit/std_logs/ -p $UserProxy 
 	done >& submitting_log/${subLog}
 fi
 
