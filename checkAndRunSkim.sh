@@ -44,7 +44,7 @@ for SkimFilter in $SkimFilters; do
 		if [ $FreeSpace -lt $SkimSpace ]; then 
 			echo "ERROR less than $SkimSpace kb of space left on /data/tmp. Will not skim. Exiting."
 			echo "If the threshold is too high, you may change the required space in config $1 by modifying variable SkimSpace."
-			which mail >& /dev/null && mail -s "ERROR less than $SkimSpace kb of space left on /data/tmp. Will not skim. Exiting." "$UserEmail" < `echo "If the threshold is too high, you may change the required space in config $1 by modifying variable SkimSpace."`
+			which mail >& /dev/null && mail -s "ERROR less than $SkimSpace kb of space left on $NFSDir. Will not skim. Exiting." "$UserEmail" < `echo "If the threshold is too high, you may change the required space in config $1 by modifying variable SkimSpace."`
 			exit 1
 		fi
 
