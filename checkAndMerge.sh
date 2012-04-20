@@ -59,11 +59,11 @@ if [ ! -f $LibMiniFWLite ]; then
 	which mail >& /dev/null && mail -s "ERROR LibMiniFWLite $LibMiniFWLite does not exist. Will not merge. Exiting." "$UserEmail"  < /dev/null
 	exit 1
 fi
-FreeSpace=`df /data/tmp | grep -v "Filesystem" | awk '{print $4}'`
+FreeSpace=`df /data/tmp | grep -v "Filesystem" | awk '{print $3}'`
 if [ $FreeSpace -lt $MergeSpace ]; then 
 	echo "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting."
 	echo "If the threshold is too high, you may change the required space in config $1 by modifying variable MergeSpace."
-	which mail >& /dev/null && mail -s "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting." "$UserEmail" < `echo "If the threshold is too high, you may change the required space in config $1 by modifying variable MergeSpace."`
+	which mail >& /dev/null && mail -s "ERROR less than $MergeSpace kb of space left on /data/tmp. Will not merge. Exiting." "$UserEmail" < /dev/null
 	exit 1
 fi
 
@@ -190,7 +190,7 @@ ls -d [1-9]* | while read -r rn; do
 	    echo "New/updated end merge ${scriptC} " 
 	
 	    echo -e "void comb${rn}_${sec}(){\n gSystem->Load(\"${TOOL_DIR}/${LibMiniFWLite}\");\n" >> ${s}
-	    echo -e "\n\tTTree::SetMaxTreeSize(8000000000);" >> ${s}   #set the max size of merged root files to 8 Gb
+		echo -e "\n\tTTree::SetMaxTreeSize(6000000000LL);" >> ${s}   #set the max size of merged root files to 6 Gb
 	    echo -e "\n\te = new TChain(\"Events\");\n "  >> ${s}
 	fi
 	echo -e "\n\te->Add(\"${rn}/${f}\");">> ${s}
@@ -218,6 +218,8 @@ done
 
 #echo Testing only && exit 30
 
+
+#create a list of merging .C files that have not been merged yet
 'rm' -f merge.list
 touch merge.list
 ls newC/*.C | while read -r  nC ;  do 
@@ -234,11 +236,13 @@ ls newC/*.C | while read -r  nC ;  do
     fi
 done 
 
+#loop through .C files in newC, run them, then move the merged file to hadoop
 cat merge.list | grep C$ | while read -r f ;  do 
     echo $f
-    root -l -b -q $f
+    root -l -b -q $f #merge files
     nC=${f}
     oC=`echo ${nC} | sed -e "s?newC/?oldC/?g"`
+	#check that merging worked properly
     fDest=`grep Merge ${nC} | tr '\"' '\n' | grep _ready`
     if [ "x${fDest}" == "x" ] ; then
 		echo "Corrupt ${nC}"
@@ -247,32 +251,39 @@ cat merge.list | grep C$ | while read -r f ;  do
     fi
     if [ -s "${fDest}" ] ; then
 		echo "all done with ${fDest} , copy $nC to $oC"
-		fDGood=`echo ${fDest} | sed -e 's/_ready//g;s?/temp/?/?g'`
-		mv ${fDest} ${fDGood}
-		mv ${nC} ${oC}
-		chmod a-w ${oC}
-		fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${MergingDir}/\${DatasetDir}/\${CMS2Tag}?\${MergedDatasetDir}?g;s?/hadoop??g"` 
-		echo ${fDGood}
+		# when root merges, if the files hit the file size limit, it will spawn new files (e.g. merge.root, merge_1.root, merge_2.root), 
+        # so loop through all the possible outputs
 		echo ${MergingDir}
 		echo ${MergedDatasetDir}
-		echo ${fDGood_hadoop}
-		hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
+		for rootfile in `ls ${fDest%.root}*.root`; do
+			fDGood=`echo ${rootfile} | sed -e 's/_ready//g;s?/temp/?/?g'`
+			mv ${rootfile} ${fDGood}
+		
+			fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${MergingDir}/\${DatasetDir}/\${CMS2Tag}?\${MergedDatasetDir}?g;s?/hadoop??g"` 
+			echo "  ${fDGood}"
+			echo "  ${fDGood_hadoop}"
+			hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
 	
-		copyE="$?"
-		[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
+			copyE="$?"
+			[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
        
-		fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
-		fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
-		echo source file $fSize_in
-		echo destination file $fSize_out
-		if [ "$fSize_in" -ne  "$fSize_out" ]; then
-			'rm' /hadoop${fDGood_hadoop}
-			hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
-		elif [ "$fSize_in" ==  "$fSize_out" ]; then 
-			'rm' ${fDGood}
-		else
-			echo Error while copying from /data/tmp to hadoop && exit 59 
-		fi
+			fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
+			fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
+			echo source file $fSize_in
+			echo destination file $fSize_out
+			if [ "$fSize_in" -ne  "$fSize_out" ]; then
+				'rm' /hadoop${fDGood_hadoop}
+				hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
+			elif [ "$fSize_in" ==  "$fSize_out" ]; then 
+				'rm' ${fDGood}
+			else
+				echo Error while copying from /data/tmp to hadoop && exit 59 
+			fi
+		done
+		
+		#move newC to oldC for accounting reasons and protect from deletion
+		mv ${nC} ${oC}
+		chmod a-w ${oC}
     fi
 done >& merging_log/merging.log.`date '+\%Y.\%m.\%d-\%H.\%M.\%S'`
 #now move done files to merged
