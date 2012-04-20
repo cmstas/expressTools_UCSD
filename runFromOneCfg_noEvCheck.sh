@@ -19,6 +19,7 @@ CMS2Tar=$5
 CMS2Tag=$6
 
 #checkout cmssw and untar the libraries and py files
+scram list
 scram project -n ${CMSSWRelease}_$CMS2Tag CMSSW $CMSSWRelease
 if [ $? != 0 ]; then
 	echo "ERROR: Failed to check out CMSSW release $CMSSWRelease. Exiting job without running."
