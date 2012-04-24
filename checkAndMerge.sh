@@ -280,6 +280,8 @@ cat merge.list | grep C$ | while read -r f ;  do
 				if [ "$?" != 0 ]; then
 					echo "Error: Failed to copy ${fDGood} to ${fDGood_hadoop}."
 					which mail >& /dev/null && mail -s "Error: Failed to copy ${fDGood} to ${fDGood_hadoop}." "$UserEmail" < /dev/null
+				else
+					'rm' ${fDGood} #this may not be the best way to do this, basically, if it seems like the above copy worked, then remove the file from /data/tmp
 				fi
 			elif [ "$fSize_in" ==  "$fSize_out" ]; then 
 				'rm' ${fDGood}
