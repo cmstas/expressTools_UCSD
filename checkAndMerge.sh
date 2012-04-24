@@ -265,15 +265,22 @@ cat merge.list | grep C$ | while read -r f ;  do
 			hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
 	
 			copyE="$?"
-			[ "$copyE" != 0 ] && 'rm' /hadoop${fDGood_hadoop} && hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
-       
-			fSize_in=` ls -l ${fDGood}|awk '{print $5}' `
-			fSize_out=` ls -l /hadoop${fDGood_hadoop}|awk '{print $5}' `
+			if [ "$copyE" != 0 ]; then
+				'rm' /hadoop${fDGood_hadoop} 
+				hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop} 
+			fi
+
+			fSize_in=` ls -l ${fDGood} | awk '{print $5}' `
+			fSize_out=` ls -l /hadoop${fDGood_hadoop} | awk '{print $5}' `
 			echo source file $fSize_in
 			echo destination file $fSize_out
 			if [ "$fSize_in" -ne  "$fSize_out" ]; then
 				'rm' /hadoop${fDGood_hadoop}
-				hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}	    
+				hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
+				if [ "$?" != 0 ]; then
+					echo "Error: Failed to copy ${fDGood} to ${fDGood_hadoop}."
+					which mail >& /dev/null && mail -s "Error: Failed to copy ${fDGood} to ${fDGood_hadoop}." "$UserEmail" < /dev/null
+				fi
 			elif [ "$fSize_in" ==  "$fSize_out" ]; then 
 				'rm' ${fDGood}
 			else
