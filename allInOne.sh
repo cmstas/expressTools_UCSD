@@ -28,9 +28,10 @@ while [ 1 ]; do
 			#echo $MergingDir
 		    #call the script to merge output files
 			touch /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log
-			./checkAndMerge.sh $Config $Dataset 2>&1 | ./appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log  # don't merge in the background, do one dataset at a time so as not to kill the system
+			./checkAndMerge.sh $Config $Dataset 2>&1 | ./appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkAndMerge.log & # changed to merge in the background 
 		done
-		sleep 15
+		sleep 5400
+
 		for Dataset in $Datasets; do
 			DatasetDir_tmp=`echo $Dataset |sed -e 's?/?_?g' `
 			DatasetDir="${DatasetDir_tmp:1}"
@@ -38,7 +39,7 @@ while [ 1 ]; do
 			touch /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log && chmod a+r /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log
 			./checkMergeErrors.sh $Config $Dataset 2>&1 | ./appendTimeStamp.sh >> /data/tmp/${USER}/${DatasetDir}/checkMergeErrors.log &
 		done
-		sleep 5400
+		sleep 
    	done
 done
 
