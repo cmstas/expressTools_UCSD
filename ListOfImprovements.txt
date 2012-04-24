@@ -12,6 +12,8 @@
 * Script to check log files for exceptions and report them on the monitoring site.
 * Move all supporting scripts (like getLFNList.py, compareGoodRun2Data.py, ect) to a sub directory labeled "lib" or "scripts" or something.
 * add argument to specify scram_arch in runfromonecfg.sh
+* during merging, if it is interrupted, handle comb*.C files that remain in newC more gracefully (right now it exits if it finds them)
+* keep track of previous process IDs, and if they have not exited on the next look, don't respawn the process (i.e. when we spawn checkAndMerge.sh, store the process id, on the next loop, if it's still running, don't spawn check and merge again)
 
  -- DONE --
 * Add a configuration file with user set variables and the necessary script to read it and set variables so the users don't have to edit code to run it. Ian has already written this (not the python one, but a new bash one that can seemlessly be implemented in the bash code). It needs to be added into the scripts.
