@@ -44,13 +44,13 @@ if [ ! -d "$location" ]; then
 fi
 
 if [ ! -d "$location" ]; then
-    die 1 "Failed to make dir, $locatio. Exiting"
+    die 1 "Failed to make dir, $location. Exiting"
 fi
 
 cd "$location" 
 source /code/osgcode/cmssoft/cmsset_default.sh  > /dev/null 2>&1
 export SCRAM_ARCH="$4"
-export CVSROOT=:pserver:anonymous:98passwd@cmscvs.cern.ch:/cvs_server/repositories/CMSSW/
+export CVSROOT=:pserver:anonymous:98passwd@cmssw.cvs.cern.ch:/local/reps/CMSSW/
 export CVS_RSH=ssh
 
 if [ -d "$full_name" ]; then
