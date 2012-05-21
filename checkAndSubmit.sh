@@ -79,7 +79,8 @@ fi
 
 cat ${DatasetSubDir}/a.runs.list.tmp | grep .root > ${DatasetSubDir}/a.runs.list0.tmp
 
-
+cat ${DatasetSubdir}/a.list ${DatasetSubDir}/a.list.old | sort | uniq | grep ".root" > a.list.old # this used to be a straight cp command, but it's better that always preserves a.list.old now
+'cp' ${DatasetSubDir}/a.runs.list0.tmp ${DatasetSubDir}/a.list
 
 
 #now we have the old list and the new full list. 
@@ -87,8 +88,6 @@ cat ${DatasetSubDir}/a.runs.list.tmp | grep .root > ${DatasetSubDir}/a.runs.list
 #check for empty output
 aSize=`grep store/ ${DatasetSubDir}/a.list | grep -c root`
 [ "${aSize}" == "0" ] && echo "Failed to get file list" && exit 23
-'cp' ${DatasetSubDir}/a.list ${DatasetSubDir}/a.list.old
-'cp' ${DatasetSubDir}/a.runs.list0.tmp ${DatasetSubDir}/a.list
 'rm' -f ${DatasetSubDir}/a.list.new; touch ${DatasetSubDir}/a.list.new; grep store ${DatasetSubDir}/a.list | while read -r rn f; do grep $f ${DatasetSubDir}/a.list.old >& /dev/null || echo $rn $f >> ${DatasetSubDir}/a.list.new; done
 aNewSize=`grep -c store ${DatasetSubDir}/a.list.new`
 echo "Will submit ${aNewSize} files"
