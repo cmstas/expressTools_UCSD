@@ -64,10 +64,11 @@ else
     printf "999999 %s\n" `printf "%s %s\n" $dbslist | awk '{print $2}' | sort | uniq` > ${DatasetSubDir}/a.list.dbs
 fi
 
-if [ -s "${DatasetSubDir}/a.list.dbs" ] ; then
+adbsSize=`grep store/ ${DatasetSubDir}/a.list.dbs | grep -c root`
+if [ "$adbsSize" != "0" ] ; then
      if [ -s "${DatasetSubDir}/a.runs.list.tmp.phedex" ]; then 
-		 cat ${DatasetSubDir}/a.list.dbs|grep .root | while read -r rn f; do
-			 grep $f  ${DatasetSubDir}/a.runs.list.tmp.phedex>& /dev/null && echo $rn $f  
+		 cat ${DatasetSubDir}/a.list.dbs | grep .root | while read -r rn f; do
+			 grep $f ${DatasetSubDir}/a.runs.list.tmp.phedex >& /dev/null && echo $rn $f  
 	     done  &> ${DatasetSubDir}/a.runs.list.tmp 
      fi 
 else
@@ -79,7 +80,8 @@ fi
 
 cat ${DatasetSubDir}/a.runs.list.tmp | grep .root > ${DatasetSubDir}/a.runs.list0.tmp
 
-cat ${DatasetSubdir}/a.list ${DatasetSubDir}/a.list.old | sort | uniq | grep ".root" > a.list.old # this used to be a straight cp command, but it's better that always preserves a.list.old now
+cat ${DatasetSubdir}/a.list ${DatasetSubDir}/a.list.old | sort | uniq | grep ".root" > ${DatasetSubDir}/a.list.old.tmp 
+'mv' ${DatasetSubDir}/a.list.old.tmp ${DatasetSubDir}/a.list.old
 'cp' ${DatasetSubDir}/a.runs.list0.tmp ${DatasetSubDir}/a.list
 
 
