@@ -80,7 +80,7 @@ fi
 
 cat ${DatasetSubDir}/a.runs.list.tmp | grep .root > ${DatasetSubDir}/a.runs.list0.tmp
 
-cat ${DatasetSubdir}/a.list ${DatasetSubDir}/a.list.old | sort | uniq | grep ".root" > ${DatasetSubDir}/a.list.old.tmp 
+cat ${DatasetSubDir}/a.list ${DatasetSubDir}/a.list.old | sort | uniq | grep ".root" > ${DatasetSubDir}/a.list.old.tmp 
 'mv' ${DatasetSubDir}/a.list.old.tmp ${DatasetSubDir}/a.list.old
 'cp' ${DatasetSubDir}/a.runs.list0.tmp ${DatasetSubDir}/a.list
 
