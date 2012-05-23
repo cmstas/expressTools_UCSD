@@ -57,7 +57,7 @@ cd -
 python getLFNList_reco.py --dataset=${Dataset} | grep .root  > ${DatasetSubDir}/a.runs.list.tmp.phedex #This python script shouldn't require anything special to run, but if it fails, it may require a valid cms environment. The json module didn't used to be included in the standard python install on uaf, but  now seems to be.
 
 
-dbslist=`dbsql "find run, file where file.status=VALID and dataset=$Dataset and  run >=${MinRunNumber} and run <=${MaxRunNumber}" | grep store/ | grep .root`
+dbslist=`dbs search --production --noheader --query="find run, file where file.status=VALID and dataset=$Dataset and  run >=${MinRunNumber} and run <=${MaxRunNumber}" | grep store/ | grep .root`
 if [ `printf "%s %s\n" $dbslist | wc -l` = `printf "%s %s\n" $dbslist | awk '{print $2}' | sort | uniq | wc -l` ]; then
     printf "%s %s\n" $dbslist > ${DatasetSubDir}/a.list.dbs
 else
