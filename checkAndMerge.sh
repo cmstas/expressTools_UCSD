@@ -257,11 +257,11 @@ cat merge.list | grep C$ | while read -r f ;  do
 		echo ${MergedDatasetDir}
 		for rootfile in `ls ${fDest%.root}*.root`; do
 			fDGood=`echo ${rootfile} | sed -e 's/_ready//g;s?/temp/?/?g'`
+			echo Moving root file ${rootfile} to ${fDGood}
 			mv ${rootfile} ${fDGood}
-		
+			
 			fDGood_hadoop=`echo ${fDGood} | sed -e "s?\${MergingDir}/\${DatasetDir}/\${CMS2Tag}?\${MergedDatasetDir}?g;s?/hadoop??g"` 
-			echo "  ${fDGood}"
-			echo "  ${fDGood_hadoop}"
+			echo copy ${fDGood} to  ${fDGood_hadoop}
 			hadoop fs -copyFromLocal  ${fDGood} ${fDGood_hadoop}
 	
 			copyE="$?"
@@ -296,7 +296,7 @@ cat merge.list | grep C$ | while read -r f ;  do
     fi
 done >& merging_log/merging.log.`date '+\%Y.\%m.\%d-\%H.\%M.\%S'`
 #now move done files to merged
-find ${MergingDir}/ -name merged_ntuple\*_ready.root | while read -r f ; do
+find ${MergingDir}/${DatasetDir}/${CMS2Tag}/temp/ -maxdepth 1 -name merged_ntuple\*_ready.root | while read -r f ; do
     echo ${f}
     fo=`echo $f | sed -e 's/_ready//g;s?/temp/?/failed?g'`
     mv ${f} ${fo}
