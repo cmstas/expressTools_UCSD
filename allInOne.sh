@@ -7,9 +7,9 @@ source /data/vdt/setup.sh
 
 ConfigFiles=$@ #list of config files specified by the user on the command line
 echo $ConfigFiles
-
-while [ 1 ]; do
-	for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
+Config=$ConfigFiles
+#while [ 1 ]; do
+      #for Config in $ConfigFiles; do #loop over the config files and use each one to run whileloop.sh
 		. loadConfig.sh $Config  #load the configuration file specified by the user
 		Datasets=`echo $Datasets | sed 's/,/ /g'`
 		for Dataset in $Datasets; do #loop over all of the datasets listed in the config file
@@ -60,10 +60,11 @@ while [ 1 ]; do
 				eval "$pid=$!"
 			fi
 		done
-		sleep 15
 
-   	done
-done
+		sleep 15
+   	#done
+#done
+
 
 
 
