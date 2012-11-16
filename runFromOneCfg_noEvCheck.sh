@@ -112,9 +112,9 @@ ls -lh ./*
 #now copy all files from local dir and subdirs to the storage place
 nRootFile=0
 find ./ -type f -name "*.root" | while read -r f; do 
-   	nRootFile++
+   	nRootFile=$(($nRootFile+1))
 done
-if [ $nRootFile -gt 1 }; then 
+if [ $nRootFile -gt 1 ]; then 
     echo There are more than one root files!!
     exit 48
 fi
