@@ -180,6 +180,7 @@ error =${std_log_dir}/1e.\$(Cluster).\$(Process).err
 notification=Never
 #x509userproxy=$ENV(X509_USER_PROXY)	
 x509userproxy=$user_proxy
+should_transfer_files = yes
 queue
 	
 @EOF
